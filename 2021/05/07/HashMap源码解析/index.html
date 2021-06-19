@@ -244,7 +244,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-05-08
+                    2021-05-12
                 </div>
                 
 
@@ -266,7 +266,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>  在JDK1.8中，HashMap的数据结构为哈希桶数组，哈希桶数组为数组+链表，每个链表的头节点为数组重的一个元素，当链表中元素个数达到8个，并且数组长度大于64时，会将链表转化为红黑树。</p>
+                <h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>在JDK1.8中，HashMap的数据结构为哈希桶数组，哈希桶数组为数组+链表，每个链表的头节点为数组重的一个元素，当链表中元素个数达到8个，并且数组长度大于64时，会将链表转化为红黑树。</p>
 <h3 id="主要成员变量及含义"><a href="#主要成员变量及含义" class="headerlink" title="主要成员变量及含义"></a>主要成员变量及含义</h3><pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">&#x2F;&#x2F;默认数组大小，如果不指定则为16
 static final int DEFAULT_INITIAL_CAPACITY &#x3D; 1 &lt;&lt; 4; &#x2F;&#x2F; aka 16
 &#x2F;&#x2F;数组最大长度，数值为2^30，当数组长度达到这个值时，数组不会再进行扩容
@@ -285,8 +285,8 @@ transient Node&lt;K,V&gt;[] table;
 int threshold;
 &#x2F;&#x2F;实际的负载因子
 final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  HashMap的哈希桶数组使用transient关键字修饰。其原因主要是对于不同的虚拟机，同一个对象的hashCode的值并不一定一样，也就是对于同一个HashMap，在不同的虚拟机中，同一个元素所在的哈希桶数组的位置可能不一样；因此序列化的时候不保存哈希桶数组而只是保存HashMap中所有的元素，在反序列化的时候将所有元素取出，然后重新构建哈希桶数组。</p>
-<p>  不直接使用红黑树存储数据是因为树节点占用的空间大概为链表节点的两倍，而且红黑树插入元素时操作更加复杂。当链表长度为8的时候转化为红黑树是因为根据柏松分布，如果负载因子为0.75时，λ大概为0.5，这种情况下每个链表长度出现的概率为</p>
+<p>HashMap的哈希桶数组使用transient关键字修饰。其原因主要是对于不同的虚拟机，同一个对象的hashCode的值并不一定一样，也就是对于同一个HashMap，在不同的虚拟机中，同一个元素所在的哈希桶数组的位置可能不一样；因此序列化的时候不保存哈希桶数组而只是保存HashMap中所有的元素，在反序列化的时候将所有元素取出，然后重新构建哈希桶数组。</p>
+<p>不直接使用红黑树存储数据是因为树节点占用的空间大概为链表节点的两倍，而且红黑树插入元素时操作更加复杂。当链表长度为8的时候转化为红黑树是因为根据柏松分布，如果负载因子为0.75时，λ大概为0.5，这种情况下每个链表长度出现的概率为</p>
 <table>
 <thead>
 <tr>
@@ -331,16 +331,16 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
 <td align="center">0.00000006</td>
 </tr>
 </tbody></table>
-<p>  可以看到，链表长度为8出现的概率很小，因此这个时候转化为红黑树性价比很高</p>
+<p>可以看到，链表长度为8出现的概率很小，因此这个时候转化为红黑树性价比很高</p>
 <h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><h4 id="无参构造"><a href="#无参构造" class="headerlink" title="无参构造"></a>无参构造</h4><pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public HashMap() &#123;
   this.loadFactor &#x3D; DEFAULT_LOAD_FACTOR;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>  无参构造函数只是将负载因子进行赋值，并没有构造哈希桶数组</p>
+<p>无参构造函数只是将负载因子进行赋值，并没有构造哈希桶数组</p>
 <h4 id="有参构造"><a href="#有参构造" class="headerlink" title="有参构造"></a>有参构造</h4><pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public HashMap(int initialCapacity, float loadFactor) &#123;
   if (initialCapacity &lt; 0)
       throw new IllegalArgumentException(&quot;Illegal initial capacity: &quot; +
                                           initialCapacity);
-  &#x2F;&#x2F;如果传入的初始数组大小大于最大长度，则去最大长度
+  &#x2F;&#x2F;如果传入的初始数组大小大于最大长度，则取最大长度
   if (initialCapacity &gt; MAXIMUM_CAPACITY)
       initialCapacity &#x3D; MAXIMUM_CAPACITY;
   if (loadFactor &lt;&#x3D; 0 || Float.isNaN(loadFactor))
@@ -349,7 +349,7 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   this.loadFactor &#x3D; loadFactor;
   this.threshold &#x3D; tableSizeFor(initialCapacity);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  有参构造函数中对负载因子进行赋值，并根据入参中的初始长度生成threshold（此时的threshold等于数组长度，但在真正构建数组的时候会变为数组长度*负载因子）<br>  tableSizeFor方法代码如下</p>
+<p>有参构造函数中对负载因子进行赋值，并根据入参中的初始长度生成threshold（此时的threshold等于数组长度，但在真正构建数组的时候会变为数组长度*负载因子）<br>  tableSizeFor方法代码如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">static final int tableSizeFor(int cap) &#123;
   int n &#x3D; cap - 1;
   &#x2F;&#x2F;保证n用二进制表示时最高2位为1（这里的最高位指二进制表示时从左到右数，第一个不为0的位置，如果n用二进制表示时小于等于2位，则从最高位起每一位都已经被改为1，以下同理）
@@ -364,25 +364,25 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   n |&#x3D; n &gt;&gt;&gt; 16;
   return (n &lt; 0) ? 1 : (n &gt;&#x3D; MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  可以看到，tableSizeFor中在return前的代码保证了n必定为2的幂次方-1，所以这个方法返回的数组长度必定为2的幂次方</p>
-<h3 id="添加元素"><a href="#添加元素" class="headerlink" title="添加元素"></a>添加元素</h3><p>  HashMap添加元素的方法如下</p>
+<p>可以看到，tableSizeFor中在return前的代码保证了n必定为2的幂次方-1，所以这个方法返回的数组长度必定为2的幂次方</p>
+<h3 id="添加元素"><a href="#添加元素" class="headerlink" title="添加元素"></a>添加元素</h3><p>HashMap添加元素的方法如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public V put(K key, V value) &#123;
   return putVal(hash(key), key, value, false, true);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>  hash方法中根据key的hashCode进行了一次hash算法，这种hash算法，将hashCode的高16位和低16位都进行了运算，可以有效减少哈希碰撞，实现如下</p>
+<p>hash方法中根据key的hashCode进行了一次hash算法，这种hash算法，将hashCode的高16位和低16位都进行了运算，可以有效减少哈希碰撞，实现如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">static final int hash(Object key) &#123;
   int h;
   return (key &#x3D;&#x3D; null) ? 0 : (h &#x3D; key.hashCode()) ^ (h &gt;&gt;&gt; 16);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  真正放入元素的方法为putVal，实现如下</p>
+<p>真正放入元素的方法为putVal，实现如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                boolean evict) &#123;
   Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; int n, i;
-  &#x2F;&#x2F;初始化哈希桶数组
   if ((tab &#x3D; table) &#x3D;&#x3D; null || (n &#x3D; tab.length) &#x3D;&#x3D; 0)
+      &#x2F;&#x2F;初始化哈希桶数组
       n &#x3D; (tab &#x3D; resize()).length;
-  &#x2F;&#x2F;如果所在位置的数组元素为空，则直接放入数组该位置
   if ((p &#x3D; tab[i &#x3D; (n - 1) &amp; hash]) &#x3D;&#x3D; null)
+      &#x2F;&#x2F;如果所在位置的数组元素为空，则直接放入数组该位置
       tab[i] &#x3D; newNode(hash, key, value, null);
   else &#123;
     Node&lt;K,V&gt; e; K k;
@@ -427,7 +427,7 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   afterNodeInsertion(evict);
   return null;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  putVal的主要逻辑如下：</p>
+<p>putVal的主要逻辑如下：</p>
 <ol>
 <li>对哈希桶数组进行判断，如果哈希桶数组还未初始化，则调用resize方法进行初始化;</li>
 <li>将hash值对数组长度进行取模，获取插入元素在数组中的位置，如果数组该位置为空，则直接构造元素，并放入数组对应位置；</li>
@@ -435,22 +435,22 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
 <li>判断元素插入后是否需要扩容，如果需要，则调用resize方法进行扩容</li>
 </ol>
 <p>  向链表中插入元素的时候，使用的是尾插法，而不是像JDK1.7中一样使用头插法。主要是因为在JDK1.7中，多线程环境下，如果哈希桶的扩容和元素插入同时进行，有可能会形成环形链表，导致get和put元素时会一直在环形链表中死循环。</p>
-<p>  putVal中初始化和扩容时都调用了resize方法，其实现如下</p>
+<p>putVal中初始化和扩容时都调用了resize方法，其实现如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final Node&lt;K,V&gt;[] resize() &#123;
     Node&lt;K,V&gt;[] oldTab &#x3D; table;
     int oldCap &#x3D; (oldTab &#x3D;&#x3D; null) ? 0 : oldTab.length;
     int oldThr &#x3D; threshold;
     int newCap, newThr &#x3D; 0;
-    &#x2F;&#x2F;如果老数组的长度大于0，则扩容
     if (oldCap &gt; 0) &#123;
-      &#x2F;&#x2F;如果数组已经达到最大长度，则不进行扩容，直接返回当前数组
+      &#x2F;&#x2F;如果老数组的长度大于0，则扩容
       if (oldCap &gt;&#x3D; MAXIMUM_CAPACITY) &#123;
+        &#x2F;&#x2F;如果数组已经达到最大长度，则不进行扩容，直接返回当前数组
         threshold &#x3D; Integer.MAX_VALUE;
         return oldTab;
       &#125;
-      &#x2F;&#x2F;否则将数组长度和threshold翻倍
       else if ((newCap &#x3D; oldCap &lt;&lt; 1) &lt; MAXIMUM_CAPACITY &amp;&amp;
              oldCap &gt;&#x3D; DEFAULT_INITIAL_CAPACITY)
+        &#x2F;&#x2F;否则将数组长度和threshold翻倍
         newThr &#x3D; oldThr &lt;&lt; 1;
     &#125;
     else if (oldThr &gt; 0)
@@ -461,8 +461,8 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
       newCap &#x3D; DEFAULT_INITIAL_CAPACITY;
       newThr &#x3D; (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     &#125;
-    &#x2F;&#x2F;如果HashMap是根据有参构造生成的，newThr并未被赋值，要重新计算threshold的值
     if (newThr &#x3D;&#x3D; 0) &#123;
+      &#x2F;&#x2F;如果HashMap是根据有参构造生成的，newThr并未被赋值，要重新计算threshold的值
       float ft &#x3D; (float)newCap * loadFactor;
       newThr &#x3D; (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (float)MAXIMUM_CAPACITY ?
                 (int)ft : Integer.MAX_VALUE);
@@ -471,8 +471,8 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
     @SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)
         Node&lt;K,V&gt;[] newTab &#x3D; (Node&lt;K,V&gt;[])new Node[newCap];
     table &#x3D; newTab;
-    &#x2F;&#x2F;对扩容后的数组进行填充
     if (oldTab !&#x3D; null) &#123;
+      &#x2F;&#x2F;对扩容后的数组进行填充
       for (int j &#x3D; 0; j &lt; oldCap; ++j) &#123;
         Node&lt;K,V&gt; e;
         &#x2F;&#x2F;对数组中每个元素的处理，要注意的是，如果老数组长度为n，元素所处的数组位置为i，则扩容后，这个元素所处的数组位置要么是i，要么是i+n
@@ -520,13 +520,21 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
     &#125;
     return newTab;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  resize方法中扩容时，对树形节点调用了树节点的split方法，其实现如下</p>
+<p>resize执行流程：</p>
+<ol>
+<li>判断数组长度是否大于0，如果大于0，说明数组已经初始化，再判断数组长度是否已达上限，达到上限则不进行扩容并直接返回，否则将数组长度和threshold翻倍</li>
+<li>如果数组长度为0，要判断HashMap是根据有参构造方法还是无参构造方法生成的，主要根据threshold是否大于0来判断，有参构造方法生成时，哈希桶数组长度取threshold，如果是无参构造方法生成的HashMap，则将数组长度和threshold都取默认值</li>
+<li>有参构造方法生成的HashMap要重新根据数组长度计算threshold的值</li>
+<li>构造新的哈希桶数组，如果旧的哈希桶数组为null，说明本次是进行数组初始化，直接返回新的哈希桶数组</li>
+<li>如果旧的哈希桶数组不为null，说明本次是进行数组扩容，则遍历数组，将链表（或红黑树）的每个节点重新计算新数组的位置，放入新数组中，如果一个节点处于旧数组的i位置（旧数组长度为n），则它在新数组中要么位于i位置（hash&amp;n==0）要么位于i+n位置（hash&amp;n==1）</li>
+</ol>
+<p>resize方法中扩容时，对树形节点调用了树节点的split方法，其实现如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final void split(HashMap&lt;K,V&gt; map, Node&lt;K,V&gt;[] tab, int index, int bit) &#123;
   TreeNode&lt;K,V&gt; b &#x3D; this;
   TreeNode&lt;K,V&gt; loHead &#x3D; null, loTail &#x3D; null;
   TreeNode&lt;K,V&gt; hiHead &#x3D; null, hiTail &#x3D; null;
   int lc &#x3D; 0, hc &#x3D; 0;
-  &#x2F;&#x2F;将一颗红黑树变为两颗红黑树
+  &#x2F;&#x2F;将一颗红黑树变为两张链表
   for (TreeNode&lt;K,V&gt; e &#x3D; b, next; e !&#x3D; null; e &#x3D; next) &#123;
     next &#x3D; (TreeNode&lt;K,V&gt;)e.next;
     e.next &#x3D; null;
@@ -570,35 +578,40 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
       &#125;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  在putVal方法中，构造红黑树调用了treeifyBin方法，其实现如下</p>
-<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">  final void treeifyBin(Node&lt;K,V&gt;[] tab, int hash) &#123;
-    int n, index; Node&lt;K,V&gt; e;
-    &#x2F;&#x2F;如果哈希桶数组为空，或者数组长度小于64，先扩容，而不是转化为红黑树
-    if (tab &#x3D;&#x3D; null || (n &#x3D; tab.length) &lt; MIN_TREEIFY_CAPACITY)
-      resize();
-    else if ((e &#x3D; tab[index &#x3D; (n - 1) &amp; hash]) !&#x3D; null) &#123;
-      TreeNode&lt;K,V&gt; hd &#x3D; null, tl &#x3D; null;
-      do &#123;
-        TreeNode&lt;K,V&gt; p &#x3D; replacementTreeNode(e, null);
-        if (tl &#x3D;&#x3D; null)
-          hd &#x3D; p;
-        else &#123;
-          p.prev &#x3D; tl;
-          tl.next &#x3D; p;
-        &#125;
-        tl &#x3D; p;
-      &#125; while ((e &#x3D; e.next) !&#x3D; null);
-      if ((tab[index] &#x3D; hd) !&#x3D; null)
-        hd.treeify(tab);
+<p>split的逻辑为</p>
+<ol>
+<li>根据头节点取红黑树中的每个每个节点，并根据每个节点的hash值判断处于新数组的哪个位置，处于相同位置的节点构造为一个链表</li>
+<li>每个红黑树迁移后最多变为两张链表，再根据链表中节点个数是否小于等于6来判断两张链表最终会变成链表还是红黑树</li>
+</ol>
+<p>在putVal方法中，构造红黑树调用了treeifyBin方法，其实现如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final void treeifyBin(Node&lt;K,V&gt;[] tab, int hash) &#123;
+  int n, index; Node&lt;K,V&gt; e;
+  &#x2F;&#x2F;如果哈希桶数组为空，或者数组长度小于64，先扩容，而不是转化为红黑树
+  if (tab &#x3D;&#x3D; null || (n &#x3D; tab.length) &lt; MIN_TREEIFY_CAPACITY)
+    resize();
+  else if ((e &#x3D; tab[index &#x3D; (n - 1) &amp; hash]) !&#x3D; null) &#123;
+    TreeNode&lt;K,V&gt; hd &#x3D; null, tl &#x3D; null;
+    do &#123;
+      TreeNode&lt;K,V&gt; p &#x3D; replacementTreeNode(e, null);
+      if (tl &#x3D;&#x3D; null)
+        hd &#x3D; p;
+      else &#123;
+        p.prev &#x3D; tl;
+        tl.next &#x3D; p;
+      &#125;
+      tl &#x3D; p;
+    &#125; while ((e &#x3D; e.next) !&#x3D; null);
+    if ((tab[index] &#x3D; hd) !&#x3D; null)
+      hd.treeify(tab);
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="获取元素"><a href="#获取元素" class="headerlink" title="获取元素"></a>获取元素</h3><p>  获取元素使用的是get方法，实现如下</p>
+<p>treeifyBin方法中首先判断数组是否为空，如果不为空再判断数组长度是否小于64，如果小于64，则调用resize方法进行扩容（resize方法处理链表时并没有将链表转化为红黑树，因此在极端情况下，扩容后链表的元素如果还在数组同一个位置，则会出现元素个数超过8的链表）；如果大于等于64，再将链表转为红黑树</p>
+<h3 id="获取元素"><a href="#获取元素" class="headerlink" title="获取元素"></a>获取元素</h3><p>获取元素使用的是get方法，实现如下</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public V get(Object key) &#123;
   Node&lt;K,V&gt; e;
   return (e &#x3D; getNode(hash(key), key)) &#x3D;&#x3D; null ? null : e.value;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p>  实际是根据getNode方法来获取元素的</p>
+<p>实际是根据getNode方法来获取元素的</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final Node&lt;K,V&gt; getNode(int hash, Object key) &#123;
   Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; first, e; int n; K k;
   &#x2F;&#x2F;先根据hash算出所在数组下标，然后遍历链表（红黑树）寻找hashCode等于key并且equals方法也为true的元素，如果有的话则返回，没有的话则返回null
@@ -619,7 +632,7 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   &#125;
   return null;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
+<p>get方法先根据hash值判断要寻找数组中哪个位置，然后遍历链表（或红黑树），找到key相等并且equals为true的节点，返回其value值；如果找不到，则返回null</p>
 <h3 id="移除元素"><a href="#移除元素" class="headerlink" title="移除元素"></a>移除元素</h3><p>  移除元素使用的是remove方法，实现如下:</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public V remove(Object key) &#123;
   Node&lt;K,V&gt; e;
@@ -669,7 +682,13 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   &#125;
   return null;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
+<p>removeNode方法与get方法获取元素的方式一致，如果找到了对应的key则删除。这里值得注意的一点是树节点的删除，调用了removeTreeNode方法，里面对于红黑树退化成链表的判断逻辑如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">if (root &#x3D;&#x3D; null || root.right &#x3D;&#x3D; null ||
+    (rl &#x3D; root.left) &#x3D;&#x3D; null || rl.left &#x3D;&#x3D; null) &#123;
+    tab[index] &#x3D; first.untreeify(map);  &#x2F;&#x2F; too small
+    return;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>也就是remove可能会导致出现只要4个节点的红黑树</p>
 <h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><p>  序列化使用的是writeObject方法</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private void writeObject(java.io.ObjectOutputStream s)
     throws IOException &#123;
@@ -683,7 +702,7 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
   &#x2F;&#x2F;写入哈希桶数组中每个元素
   internalWriteEntries(s);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
+<p>序列化的时候除了常用的属性写入字节流外，还将每个节点写入了字节流</p>
 <h3 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h3><p>  反序列化使用的是readObject方法</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private void readObject(java.io.ObjectInputStream s)
     throws IOException, ClassNotFoundException &#123;
@@ -726,6 +745,7 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
     &#125;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>反序列化则是将字节流中的每个元素取出来，再放入到哈希桶数组中</p>
 
                 
             </div>
@@ -786,30 +806,29 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/05/07/HashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                <a href="/2021/06/19/ConcurrentHashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="HashMap源码解析(JDK1.8)">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ConcurrentHashMap源码解析">
                         
-                        <span class="card-title">HashMap源码解析(JDK1.8)</span>
+                        <span class="card-title">ConcurrentHashMap源码解析</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            本文主要基于JDK1.8对HashMap源码进行解析
+                            本文主要基于JDK1.8对ConcurrentHashMap源码进行解析
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-05-07
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-06-19
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -822,16 +841,15 @@ final float loadFactor;<span aria-hidden="true" class="line-numbers-rows"><span>
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HashMap/">
-                        <span class="chip bg-color">HashMap</span>
+                    <a href="/tags/ConcurrentHashMap/">
+                        <span class="chip bg-color">ConcurrentHashMap</span>
                     </a>
                     
-                    <a href="/tags/JDK/">
-                        <span class="chip bg-color">JDK</span>
+                    <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">JDK源码</span>
                     </a>
                     
                 </div>

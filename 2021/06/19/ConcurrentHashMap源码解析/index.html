@@ -1,0 +1,1113 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="ConcurrentHashMap源码解析, ">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>ConcurrentHashMap源码解析 | </title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">ConcurrentHashMap源码解析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="container content">
+
+    
+    <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/ConcurrentHashMap/">
+                                <span class="chip bg-color">ConcurrentHashMap</span>
+                            </a>
+                        
+                            <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                                <span class="chip bg-color">JDK源码</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                JDK源码
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-06-19
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2021-06-20
+                </div>
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>JDK1.8版本的ConcurrentHashMap与JDK1.7采用了不同的实现。不同于JDK1.7中segment+哈希桶数组，JDK1.8使用的数据结构为一个哈希桶数组，同时由于1.8中CAS的支持，在1.8中使用CAS+synchronize锁来实现线程安全。</p>
+<h3 id="主要成员变量及其含义"><a href="#主要成员变量及其含义" class="headerlink" title="主要成员变量及其含义"></a>主要成员变量及其含义</h3><pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">&#x2F;&#x2F;数组最大长度
+private static final int MAXIMUM_CAPACITY &#x3D; 1 &lt;&lt; 30;
+&#x2F;&#x2F;数组默认长度
+private static final int DEFAULT_CAPACITY &#x3D; 16;
+&#x2F;&#x2F;默认并发数，在JDK1.7中用来指定segment的默认个数，在1.8中基本已不再使用
+private static final int DEFAULT_CONCURRENCY_LEVEL &#x3D; 16;
+&#x2F;&#x2F;负载因子
+private static final float LOAD_FACTOR &#x3D; 0.75f;
+&#x2F;&#x2F;链表节点数超过8个时转换为红黑树
+static final int TREEIFY_THRESHOLD &#x3D; 8;
+&#x2F;&#x2F;红黑树节点数少于6个时退化为链表
+static final int UNTREEIFY_THRESHOLD &#x3D; 6;
+&#x2F;&#x2F;哈希桶数组长度小于64时，链表节点数超过8个，哈希桶数组会优先扩容而不是将链表转化为红黑树
+static final int MIN_TREEIFY_CAPACITY &#x3D; 64;
+&#x2F;&#x2F;哈希桶数组扩容时，每个线程负责迁移的节点个数的最小步长
+private static final int MIN_TRANSFER_STRIDE &#x3D; 16;
+&#x2F;&#x2F;sizeCtl中用来存储扩容线程个数信息的二进制位数（低16位）
+private static int RESIZE_STAMP_BITS &#x3D; 16;
+&#x2F;&#x2F;数组扩容时，最多允许的线程数
+private static final int MAX_RESIZERS &#x3D; (1 &lt;&lt; (32 - RESIZE_STAMP_BITS)) - 1;
+&#x2F;&#x2F;sizeCtl中用来存储数组大小信息的二进制位数（高16位）
+private static final int RESIZE_STAMP_SHIFT &#x3D; 32 - RESIZE_STAMP_BITS;
+&#x2F;&#x2F;哈希桶数组
+transient volatile Node&lt;K,V&gt;[] table;
+&#x2F;&#x2F;扩容过程中新的哈希桶数组
+private transient volatile Node&lt;K,V&gt;[] nextTable;
+&#x2F;&#x2F;基础数组长度（实际数组长度可能比这个值大）
+private transient volatile long baseCount;
+&#x2F;&#x2F;值为-1时代表正在初始化，其他负数代表数组正在进行扩容，扩容时高16位与哈希桶数组大小有关，低16位为扩容的线程数+1
+private transient volatile int sizeCtl;
+&#x2F;&#x2F;数组扩容时还未被分配扩容线程的最大index
+private transient volatile int transferIndex;
+&#x2F;&#x2F;扩容时，CounterCell数组的锁
+private transient volatile int cellsBusy;
+&#x2F;&#x2F;扩容时，如果baseCount并发量太高，则将要增加的数组长度放到这个数组中（一般来说，数组长度为baseCount和这个数组中所有元素之和）
+private transient volatile CounterCell[] counterCells;
+&#x2F;&#x2F;节点正在被移动时，头节点的hash值
+static final int MOVED     &#x3D; -1;
+&#x2F;&#x2F;树形节点根节点的hash值
+static final int TREEBIN   &#x3D; -2;
+&#x2F;&#x2F;使用computeIfAbsent方法时，节点的hash值
+static final int RESERVED  &#x3D; -3;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>保存节点的哈希桶数组使用transient关键字修饰，其目的与HashMap一致，都是因为在同一个对象在不同虚拟机中的hashCode可能不一致，因此对ConcurrentHashMap序列化时只序列化每个节点，反序列化时取出每个节点重新构建哈希桶数组。</p>
+<p>###构造函数<br>####无参构造</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public ConcurrentHashMap() &#123;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>无参构造函数只是一个空实现，没有进行任何处理<br>####有参构造</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public ConcurrentHashMap(int initialCapacity,
+                       float loadFactor, int concurrencyLevel) &#123;
+  if (!(loadFactor &gt; 0.0f) || initialCapacity &lt; 0 || concurrencyLevel &lt;&#x3D; 0)
+    throw new IllegalArgumentException();
+  if (initialCapacity &lt; concurrencyLevel)   &#x2F;&#x2F; Use at least as many bins
+    initialCapacity &#x3D; concurrencyLevel;   &#x2F;&#x2F; as estimated threads
+  long size &#x3D; (long)(1.0 + (long)initialCapacity &#x2F; loadFactor);
+  int cap &#x3D; (size &gt;&#x3D; (long)MAXIMUM_CAPACITY) ?
+    MAXIMUM_CAPACITY : tableSizeFor((int)size);
+  this.sizeCtl &#x3D; cap;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>有参构造函数中，根据给定的入参计算出数组初始长度（2^n），并将其赋值给sizeCtl，其中，tableSizeFor函数的实现如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private static final int tableSizeFor(int c) &#123;
+  int n &#x3D; c - 1;
+  &#x2F;&#x2F;保证n用二进制表示时最高2位为1（这里的最高位指二进制表示时从左到右数，第一个不为0的位置，如果n用二进制表示时小于等于2位，则从最高位起每一位都已经被改为1，以下同理）
+  n |&#x3D; n &gt;&gt;&gt; 1;
+  &#x2F;&#x2F;保证n用二进制表示时最高4位为1
+  n |&#x3D; n &gt;&gt;&gt; 2;
+  &#x2F;&#x2F;保证n用二进制表示时最高8位为1
+  n |&#x3D; n &gt;&gt;&gt; 4;
+  &#x2F;&#x2F;保证n用二进制表示时最高16位为1
+  n |&#x3D; n &gt;&gt;&gt; 8;
+  &#x2F;&#x2F;保证n用二进制表示时最高32位为1
+  n |&#x3D; n &gt;&gt;&gt; 16;
+  return (n &lt; 0) ? 1 : (n &gt;&#x3D; MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过位运算，保证数组长度必定位2^n</p>
+<p>###添加元素<br>添加元素使用的是put方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public V put(K key, V value) &#123;
+  return putVal(key, value, false);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>内部直接调用了putVal方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final V putVal(K key, V value, boolean onlyIfAbsent) &#123;
+  if (key &#x3D;&#x3D; null || value &#x3D;&#x3D; null) throw new NullPointerException();
+  &#x2F;&#x2F;计算hash值
+  int hash &#x3D; spread(key.hashCode());
+  int binCount &#x3D; 0;
+  for (Node&lt;K,V&gt;[] tab &#x3D; table;;) &#123;
+    Node&lt;K,V&gt; f; int n, i, fh;
+    if (tab &#x3D;&#x3D; null || (n &#x3D; tab.length) &#x3D;&#x3D; 0)
+      &#x2F;&#x2F;如果哈希桶数组未初始化，则先初始化哈希桶数组
+      tab &#x3D; initTable();
+    else if ((f &#x3D; tabAt(tab, i &#x3D; (n - 1) &amp; hash)) &#x3D;&#x3D; null) &#123;
+      &#x2F;&#x2F;如果要添加的元素所在的数组位置为空，则直接使用cas操作将元素添加进去，成功则跳出循环
+      if (casTabAt(tab, i, null,new Node&lt;K,V&gt;(hash, key, value, null)))
+        break;
+    &#125;
+    else if ((fh &#x3D; f.hash) &#x3D;&#x3D; MOVED)
+      &#x2F;&#x2F;如果添加的元素所在数组位置头节点被移动了，说明正在进行数组扩容，则当前线程也帮忙进行扩容
+      tab &#x3D; helpTransfer(tab, f);
+    else &#123;
+      V oldVal &#x3D; null;
+      &#x2F;&#x2F;根据数组位置寻找头节点，然后进行插入，这里对头节点进行加锁并比较，是为了防止代码运行到这里时，扩容和插入同时进行
+      synchronized (f) &#123;
+        if (tabAt(tab, i) &#x3D;&#x3D; f) &#123;
+          if (fh &gt;&#x3D; 0) &#123;
+            binCount &#x3D; 1;
+            &#x2F;&#x2F;遍历链表，如果找到key相等且equals方法为true的节点，则修改并返回旧值，否则插入并返回null
+            for (Node&lt;K,V&gt; e &#x3D; f;; ++binCount) &#123;
+              K ek;
+              if (e.hash &#x3D;&#x3D; hash &amp;&amp;
+                ((ek &#x3D; e.key) &#x3D;&#x3D; key ||
+                 (ek !&#x3D; null &amp;&amp; key.equals(ek)))) &#123;
+                oldVal &#x3D; e.val;
+                if (!onlyIfAbsent)
+                    e.val &#x3D; value;
+                break;
+              &#125;
+              Node&lt;K,V&gt; pred &#x3D; e;
+              if ((e &#x3D; e.next) &#x3D;&#x3D; null) &#123;
+                pred.next &#x3D; new Node&lt;K,V&gt;(hash, key,value, null);
+                break;
+              &#125;
+            &#125;
+          &#125;
+          else if (f instanceof TreeBin) &#123;
+            &#x2F;&#x2F;如果是树节点，则使用树节点的putVal方法
+            Node&lt;K,V&gt; p;
+            binCount &#x3D; 2;
+            if ((p &#x3D; ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,value)) !&#x3D; null) &#123;
+              oldVal &#x3D; p.val;
+              if (!onlyIfAbsent)
+                  p.val &#x3D; value;
+            &#125;
+          &#125;
+        &#125;
+      &#125;
+      if (binCount !&#x3D; 0) &#123;
+        &#x2F;&#x2F;插入成功后，判断是否需要将链表变为数组
+        if (binCount &gt;&#x3D; TREEIFY_THRESHOLD)
+          treeifyBin(tab, i);
+        if (oldVal !&#x3D; null)
+          return oldVal;
+        break;
+      &#125;
+    &#125;
+  &#125;
+  &#x2F;&#x2F;将ConcurrentHashMap的size加一
+  addCount(1L, binCount);
+  return null;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>putVal方法的执行逻辑为：</p>
+<ol>
+<li>调用spread方法计算插入节点的hash值</li>
+<li>判断哈希桶数组是否为空，如果为空，则先调用initTable方法初始化数组，进入下一次循环</li>
+<li>如果不为空，则找到插入节点所在的数组位置，如果该位置为空，则使用cas操作将要插入的节点放在数组该位置并跳出循环</li>
+<li>如果该位置不为空，则对该位置进行加锁。加锁失败进入下一个循环，加锁成功则先比较数组该位置头节点在加锁前后是否改变，如果改变了，则说明当前在进行扩容，进入下一次循环</li>
+<li>如果没有改变，说明只有当前线程在操作链表（红黑树），先查看头节点哈希值是否大于等于0（树形节点哈希值小于0），如果大于等于0，则数组该位置说明为链表，遍历链表，如果key已经存在，则替换value值，否则在链表结尾添加新节点</li>
+<li>如果头节点的哈希值小于0，则判断是否为树形节点，如果是的话，调用树形节点的putTreeVal方法</li>
+<li>添加元素结束后，调用addCount方法将ConcurrentHashMap的size加一</li>
+</ol>
+<p>如果哈希桶数组未初始化，则会先调用initTable方法进行数组的初始化，其实现如下：</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private final Node&lt;K,V&gt;[] initTable() &#123;
+  Node&lt;K,V&gt;[] tab; int sc;
+  &#x2F;&#x2F;如果一次循环结束哈希桶数组还未初始化，则再次进入循环
+  while ((tab &#x3D; table) &#x3D;&#x3D; null || tab.length &#x3D;&#x3D; 0) &#123;
+    &#x2F;&#x2F;如果sizeCtl小于0，则说明数组正在进行初始化或者正在扩容，让出线程的时间片，进行自旋
+    if ((sc &#x3D; sizeCtl) &lt; 0)
+      Thread.yield();
+    else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) &#123;
+      &#x2F;&#x2F;如果通过cas操作将sc置为-1成功，则说明获得了初始化线程的锁，开始初始化线程
+      try &#123;
+        &#x2F;&#x2F;再次判断哈希桶数组是否未初始化，防止其他线程初始化并放入元素后（此时sc&gt;0），本线程获得锁，然后重新将哈希桶数组初始化
+        if ((tab &#x3D; table) &#x3D;&#x3D; null || tab.length &#x3D;&#x3D; 0) &#123;
+          &#x2F;&#x2F;如果sc大于0，则说明ConcurrentHashMap是通过有参构造生成的，此时sc即为数组大小，否则，说明ConcurrentHashMap是通过无参构造生成的，直接使用默认数组大小
+          int n &#x3D; (sc &gt; 0) ? sc : DEFAULT_CAPACITY;
+          @SuppressWarnings(&quot;unchecked&quot;)
+          Node&lt;K,V&gt;[] nt &#x3D; (Node&lt;K,V&gt;[])new Node&lt;?,?&gt;[n];
+          table &#x3D; tab &#x3D; nt;
+          &#x2F;&#x2F;sc等于0.75n，
+          sc &#x3D; n - (n &gt;&gt;&gt; 2);
+        &#125;
+      &#125; finally &#123;
+        &#x2F;&#x2F;假如数组初始化后通过cas操作将sizeCtl置为-1，但实际未通过try中的if判断，则需要将sizeCtl改为原来的值；如果进入了if判断，则将sizeCtl改为数组长度的0.75倍
+        sizeCtl &#x3D; sc;
+      &#125;
+      break;
+    &#125;
+  &#125;
+  return tab;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>initTable方法执行逻辑为:</p>
+<ol>
+<li>判断哈希桶数组是否未生成，如果未生成则进入循环</li>
+<li>进入循环后判断sizeCtl是否小于0，则说明其他线程正在对数组进行初始化或者扩容，让出线程执行的时间片，进行自旋</li>
+<li>如果大于等于0，通过cas将sizeCtl改为-1。这里也分两种情况，一是哈希桶数组已经初始化(sc&gt;0)，二是哈希桶数组未进行初始化(sc=0)，因此需要继续判断是否哈希桶数组未进行初始化</li>
+<li>如果数组未进行初始化，则进行初始化，并将sizeCtl的值设为初始数组长度的0.75倍；如果数组已经进行了初始化，则将sizeCtl设为原值</li>
+</ol>
+<p>如果当前哈希桶数组正在扩容，会调用helpTransfer方法，将当前线程也加入到扩容线程中，其实现如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final Node&lt;K,V&gt;[] helpTransfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt; f) &#123;
+  Node&lt;K,V&gt;[] nextTab; int sc;
+  &#x2F;&#x2F;如果确定要扩容，并且nextTable不为空，则将当前线程加入扩容线程中
+  if (tab !&#x3D; null &amp;&amp; (f instanceof ForwardingNode) &amp;&amp;
+    (nextTab &#x3D; ((ForwardingNode&lt;K,V&gt;)f).nextTable) !&#x3D; null) &#123;
+    &#x2F;&#x2F;resizeStamp方法返回的是基于哈希桶数组生成的与数组大小有关的数字，其高16位为0，且第17位为1
+    int rs &#x3D; resizeStamp(tab.length);
+    while (nextTab &#x3D;&#x3D; nextTable &amp;&amp; table &#x3D;&#x3D; tab &amp;&amp;
+           (sc &#x3D; sizeCtl) &lt; 0) &#123;
+      &#x2F;&#x2F;if中第一个条件代表当前线程操作的数组和目前ConcurrentHashMap扩容的数组不是同一个数组（大小一致），第二和第三个条件在1.8中实际上是bug，实际上是用来判断数组是否已经扩容完成或是否达到最大扩容线程，第四个判断条件代表数组已扩容完成，如果有任一条件为真，则跳出循环
+      if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) !&#x3D; rs || sc &#x3D;&#x3D; rs + 1 ||
+        sc &#x3D;&#x3D; rs + MAX_RESIZERS || transferIndex &lt;&#x3D; 0)
+        break;
+      if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1)) &#123;
+        &#x2F;&#x2F;调用transfer方法进行扩容
+        transfer(tab, nextTab);
+        break;
+      &#125;
+    &#125;
+    return nextTab;
+  &#125;
+  return table;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>helpTransfer方法的执行逻辑为：</p>
+<ol>
+<li>判断node中记录的nextTable是否为空，如果为空则不做任何操作</li>
+<li>判断当前数组是否正在扩容，如果是，则判断node中记录的nextTab和当前ConcurrentHashMap中正在扩容的nextTable是否不是同一个数组（通过数组长度判断），数组是否已经扩容完成或已经达到最大扩容线程，如果任一条件为空，则直接跳出循环<br>（关于JDK1.8中的bug，详情见<a target="_blank" rel="noopener" href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8214427%EF%BC%89">https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8214427）</a></li>
+<li>如果当前线程可以加入扩容，则将sizeCtl加一，并调用transfer方法进行扩容</li>
+</ol>
+<p>其中transfer方法的实现如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">&#x2F;&#x2F;如果nextTab为空，则说明要进行扩容，如果不为空，则说明是其他线程来帮助数组扩容
+private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) &#123;
+  int n &#x3D; tab.length, stride;
+  &#x2F;&#x2F;stride代表每个线程扩容时，要负责将几个数组元素进行迁移(每个数组元素都是链表或者红黑树)
+  if ((stride &#x3D; (NCPU &gt; 1) ? (n &gt;&gt;&gt; 3) &#x2F; NCPU : n) &lt;  MIN_TRANSFER_STRIDE)
+      stride &#x3D; MIN_TRANSFER_STRIDE;
+  &#x2F;&#x2F;如果没有给定扩容之后的nextTab，则需要进行初始化，nextTab长度为老的数组的长度的两倍
+  if (nextTab &#x3D;&#x3D; null) &#123;
+      try &#123;
+          @SuppressWarnings(&quot;unchecked&quot;)
+          Node&lt;K,V&gt;[] nt &#x3D; (Node&lt;K,V&gt;[])new Node&lt;?,?&gt;[n &lt;&lt; 1];
+          nextTab &#x3D; nt;
+      &#125; catch (Throwable ex) &#123;
+          sizeCtl &#x3D; Integer.MAX_VALUE;
+          return;
+      &#125;
+      nextTable &#x3D; nextTab;
+      &#x2F;&#x2F;刚开始时，没有任何线程进行扩容，此时transferIndex代表数组最后，注意，transferIndex被volatite关键字修饰，对所有的线程来说，transferIndex的改变都是可见的
+      transferIndex &#x3D; n;
+  &#125;
+  int nextn &#x3D; nextTab.length;
+  ForwardingNode&lt;K,V&gt; fwd &#x3D; new ForwardingNode&lt;K,V&gt;(nextTab);
+  boolean advance &#x3D; true;
+  boolean finishing &#x3D; false;
+  for (int i &#x3D; 0, bound &#x3D; 0;;) &#123;
+      Node&lt;K,V&gt; f; int fh;
+      &#x2F;&#x2F;循环中开始分配当前线程要负责哪些元素的迁移，其中i代表当前线程正在操作的元素的下标（除了第一次循环），bound代表当前线程负责迁移的最小的元素的下标，每个线程总是先迁移下标最大的元素，这里的advance为true代表当前线程可以进行下一个元素的迁移（第一次进入的时候明显为true，之后得确保当前线程已经完成来当前元素的迁移，这样才能进行下一个元素的迁移）
+      while (advance) &#123;
+          int nextIndex, nextBound;
+          if (--i &gt;&#x3D; bound || finishing)
+              &#x2F;&#x2F;如果当前线程已经完成全部迁移任务，或者所有元素已经完成迁移，跳出循环
+              advance &#x3D; false;
+          else if ((nextIndex &#x3D; transferIndex) &lt;&#x3D; 0) &#123;
+              &#x2F;&#x2F;如果数组中所有的元素都已经有线程负责迁移，则跳出循环
+              i &#x3D; -1;
+              advance &#x3D; false;
+          &#125;
+          else if (U.compareAndSwapInt
+                   (this, TRANSFERINDEX, nextIndex,
+                    nextBound &#x3D; (nextIndex &gt; stride ?
+                                 nextIndex - stride : 0))) &#123;
+              &#x2F;&#x2F;当前线程认领迁移任务，bound代表任务中最小下标，i代表当前操作的元素下标，刚认领任务时，i代表任务中最大下标
+              bound &#x3D; nextBound;
+              i &#x3D; nextIndex - 1;
+              advance &#x3D; false;
+          &#125;
+      &#125;
+      if (i &lt; 0 || i &gt;&#x3D; n || i + n &gt;&#x3D; nextn) &#123;
+          &#x2F;&#x2F;当前线程已经完成了任务，并且所有数组元素都有线程来负责迁移
+          int sc;
+          if (finishing) &#123;
+              &#x2F;&#x2F;如果所有的线程都已经完成了迁移任务，则将table指向新的哈希桶数组，同时将sizeCtl改为0.75n
+              nextTable &#x3D; null;
+              table &#x3D; nextTab;
+              sizeCtl &#x3D; (n &lt;&lt; 1) - (n &gt;&gt;&gt; 1);
+              return;
+          &#125;
+          &#x2F;&#x2F;当前线程已经完成了任务，将其从sizeCtl中减去
+          if (U.compareAndSwapInt(this, SIZECTL, sc &#x3D; sizeCtl, sc - 1)) &#123;
+              &#x2F;&#x2F;这个判断条件可以判断是否是最后一个线程，false代表当前线程不是最后一个扩容线程。调用transfer方法进行扩容时（入参的nextTab为空），因为调用线程也是一个线程，所以会将（resizeStamp(n) &lt;&lt; RESIZE_STAMP_SHIFT）+ 2赋值给sizeCtl，其中resizeStamp(n) &lt;&lt; RESIZE_STAMP_SHIFT低16位为0，符号位为1，即保证sizeCtl为负数，并且低16位为当前扩容线程+1
+              if ((sc - 2) !&#x3D; resizeStamp(n) &lt;&lt; RESIZE_STAMP_SHIFT)
+                  return;
+              &#x2F;&#x2F;如果是最后一个扩容线程，则将finishing改为true
+              finishing &#x3D; advance &#x3D; true;
+              i &#x3D; n;
+          &#125;
+      &#125;
+      else if ((f &#x3D; tabAt(tab, i)) &#x3D;&#x3D; null)
+          &#x2F;&#x2F;如果该元素为空，则只需要将该元素改为ForwardingNode类型的node
+          advance &#x3D; casTabAt(tab, i, null, fwd);
+      else if ((fh &#x3D; f.hash) &#x3D;&#x3D; MOVED)
+          advance &#x3D; true;
+      else &#123;
+          synchronized (f) &#123;
+              &#x2F;&#x2F;再次判断数组中同一位置的节点未变，防止扩容与插入同时进行
+              if (tabAt(tab, i) &#x3D;&#x3D; f) &#123;
+                &#x2F;&#x2F;实际的迁移逻辑，重新计算链表&#x2F;红黑树中每个元素的hash值，放到新数组中
+                  Node&lt;K,V&gt; ln, hn;
+                  if (fh &gt;&#x3D; 0) &#123;
+                      int runBit &#x3D; fh &amp; n;
+                      Node&lt;K,V&gt; lastRun &#x3D; f;
+                      for (Node&lt;K,V&gt; p &#x3D; f.next; p !&#x3D; null; p &#x3D; p.next) &#123;
+                          int b &#x3D; p.hash &amp; n;
+                          if (b !&#x3D; runBit) &#123;
+                              runBit &#x3D; b;
+                              lastRun &#x3D; p;
+                          &#125;
+                      &#125;
+                      if (runBit &#x3D;&#x3D; 0) &#123;
+                          ln &#x3D; lastRun;
+                          hn &#x3D; null;
+                      &#125;
+                      else &#123;
+                          hn &#x3D; lastRun;
+                          ln &#x3D; null;
+                      &#125;
+                      for (Node&lt;K,V&gt; p &#x3D; f; p !&#x3D; lastRun; p &#x3D; p.next) &#123;
+                          int ph &#x3D; p.hash; K pk &#x3D; p.key; V pv &#x3D; p.val;
+                          if ((ph &amp; n) &#x3D;&#x3D; 0)
+                              ln &#x3D; new Node&lt;K,V&gt;(ph, pk, pv, ln);
+                          else
+                              hn &#x3D; new Node&lt;K,V&gt;(ph, pk, pv, hn);
+                      &#125;
+                      setTabAt(nextTab, i, ln);
+                      setTabAt(nextTab, i + n, hn);
+                      setTabAt(tab, i, fwd);
+                      advance &#x3D; true;
+                  &#125;
+                  else if (f instanceof TreeBin) &#123;
+                      TreeBin&lt;K,V&gt; t &#x3D; (TreeBin&lt;K,V&gt;)f;
+                      TreeNode&lt;K,V&gt; lo &#x3D; null, loTail &#x3D; null;
+                      TreeNode&lt;K,V&gt; hi &#x3D; null, hiTail &#x3D; null;
+                      int lc &#x3D; 0, hc &#x3D; 0;
+                      for (Node&lt;K,V&gt; e &#x3D; t.first; e !&#x3D; null; e &#x3D; e.next) &#123;
+                          int h &#x3D; e.hash;
+                          TreeNode&lt;K,V&gt; p &#x3D; new TreeNode&lt;K,V&gt;
+                              (h, e.key, e.val, null, null);
+                          if ((h &amp; n) &#x3D;&#x3D; 0) &#123;
+                              if ((p.prev &#x3D; loTail) &#x3D;&#x3D; null)
+                                  lo &#x3D; p;
+                              else
+                                  loTail.next &#x3D; p;
+                              loTail &#x3D; p;
+                              ++lc;
+                          &#125;
+                          else &#123;
+                              if ((p.prev &#x3D; hiTail) &#x3D;&#x3D; null)
+                                  hi &#x3D; p;
+                              else
+                                  hiTail.next &#x3D; p;
+                              hiTail &#x3D; p;
+                              ++hc;
+                          &#125;
+                      &#125;
+                      ln &#x3D; (lc &lt;&#x3D; UNTREEIFY_THRESHOLD) ? untreeify(lo) :
+                          (hc !&#x3D; 0) ? new TreeBin&lt;K,V&gt;(lo) : t;
+                      hn &#x3D; (hc &lt;&#x3D; UNTREEIFY_THRESHOLD) ? untreeify(hi) :
+                          (lc !&#x3D; 0) ? new TreeBin&lt;K,V&gt;(hi) : t;
+                      setTabAt(nextTab, i, ln);
+                      setTabAt(nextTab, i + n, hn);
+                      setTabAt(tab, i, fwd);
+                      advance &#x3D; true;
+                  &#125;
+              &#125;
+          &#125;
+      &#125;
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在putVal方法的最后，调用了addCount方法将ConcurrentHashMap的size+1，其实现如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private final void addCount(long x, int check) &#123;
+    CounterCell[] as; long b, s;
+    if ((as &#x3D; counterCells) !&#x3D; null ||
+        !U.compareAndSwapLong(this, BASECOUNT, b &#x3D; baseCount, s &#x3D; b + x)) &#123;
+        CounterCell a; long v; int m;
+        boolean uncontended &#x3D; true;
+        if (as &#x3D;&#x3D; null || (m &#x3D; as.length - 1) &lt; 0 ||
+            (a &#x3D; as[ThreadLocalRandom.getProbe() &amp; m]) &#x3D;&#x3D; null ||
+            !(uncontended &#x3D;
+              U.compareAndSwapLong(a, CELLVALUE, v &#x3D; a.value, v + x))) &#123;
+            fullAddCount(x, uncontended);
+            return;
+        &#125;
+        if (check &lt;&#x3D; 1)
+            return;
+        s &#x3D; sumCount();
+    &#125;
+    if (check &gt;&#x3D; 0) &#123;
+        Node&lt;K,V&gt;[] tab, nt; int n, sc;
+        while (s &gt;&#x3D; (long)(sc &#x3D; sizeCtl) &amp;&amp; (tab &#x3D; table) !&#x3D; null &amp;&amp;
+               (n &#x3D; tab.length) &lt; MAXIMUM_CAPACITY) &#123;
+            int rs &#x3D; resizeStamp(n);
+            if (sc &lt; 0) &#123;
+                if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) !&#x3D; rs || sc &#x3D;&#x3D; rs + 1 ||
+                    sc &#x3D;&#x3D; rs + MAX_RESIZERS || (nt &#x3D; nextTable) &#x3D;&#x3D; null ||
+                    transferIndex &lt;&#x3D; 0)
+                    break;
+                if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
+                    transfer(tab, nt);
+            &#125;
+            else if (U.compareAndSwapInt(this, SIZECTL, sc,
+                                         (rs &lt;&lt; RESIZE_STAMP_SHIFT) + 2))
+                transfer(tab, null);
+            s &#x3D; sumCount();
+        &#125;
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>方法的执行逻辑为用baseCount来保存ConcurrentHashMap的size，但是如果baseCount的cas操作竞争很激烈，则用CounterCell来保存每次每次putVal时要加的size值，每个线程都会通过getProbe方法获取在CounterCell数组中对应的位置，并将本线程要加的size值放入该位置，如果该位置有值，则会继续寻找数组中为空的元素进行操作</p>
+<p>获取ConcurrentHashMap的size调用的是sumCount方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public int size() &#123;
+    long n &#x3D; sumCount();
+    return ((n &lt; 0L) ? 0 :
+            (n &gt; (long)Integer.MAX_VALUE) ? Integer.MAX_VALUE :
+            (int)n);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>内部调用了sumCount方法，其实现如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final long sumCount() &#123;
+    CounterCell[] as &#x3D; counterCells; CounterCell a;
+    long sum &#x3D; baseCount;
+    if (as !&#x3D; null) &#123;
+        for (int i &#x3D; 0; i &lt; as.length; ++i) &#123;
+            if ((a &#x3D; as[i]) !&#x3D; null)
+                sum +&#x3D; a.value;
+        &#125;
+    &#125;
+    return sum;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>实际上就是将baseCount和CounterCell中的值相加，就是ConcurrentHashMap的size</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/ConcurrentHashMap/">
+                                    <span class="chip bg-color">ConcurrentHashMap</span>
+                                </a>
+                            
+                                <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                                    <span class="chip bg-color">JDK源码</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/06/19/ConcurrentHashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ConcurrentHashMap源码解析">
+                        
+                        <span class="card-title">ConcurrentHashMap源码解析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            本文主要基于JDK1.8对ConcurrentHashMap源码进行解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-19
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                    JDK源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ConcurrentHashMap/">
+                        <span class="chip bg-color">ConcurrentHashMap</span>
+                    </a>
+                    
+                    <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">JDK源码</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/05/07/HashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="HashMap源码解析(JDK1.8)">
+                        
+                        <span class="card-title">HashMap源码解析(JDK1.8)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            本文主要基于JDK1.8对HashMap源码进行解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-05-07
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                    JDK源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/HashMap/">
+                        <span class="chip bg-color">HashMap</span>
+                    </a>
+                    
+                    <a href="/tags/JDK/">
+                        <span class="chip bg-color">JDK</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Xu Tao</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
