@@ -1,0 +1,985 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="ThreadPoolExecutor源码解析, ">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>ThreadPoolExecutor源码解析 | </title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">ThreadPoolExecutor源码解析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="container content">
+
+    
+    <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                                <span class="chip bg-color">JDK源码</span>
+                            </a>
+                        
+                            <a href="/tags/ThreadPoolExecutor/">
+                                <span class="chip bg-color">ThreadPoolExecutor</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                JDK源码
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-06-26
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2021-06-27
+                </div>
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>在服务器中，为了减少频繁创建线程给系统带来的不必要开销，当需要使用线程时，通常会采用线程池的方式。不同系统中的线程池实现方式不同，在JDK1.8中，线程池使用线程+等待队列的方式实现。</p>
+<p>###主要成员变量及其含义</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">&#x2F;&#x2F;ctl中，高三位存储的是线程池当前的状态，低29位存储的是线程池中线程个数(默认为RUNNING状态，线程个数为0，这里说的低29位只适用于Integer最大为2^32的系统)
+private final AtomicInteger ctl &#x3D; new AtomicInteger(ctlOf(RUNNING, 0));
+&#x2F;&#x2F;ctl中低多少位用来保存线程数，通常来说是29
+private static final int COUNT_BITS &#x3D; Integer.SIZE - 3;
+&#x2F;&#x2F;线程池能容纳的最大线程数，低29位都为1（低多少位为1取决于系统中Integer的最大值）
+private static final int CAPACITY   &#x3D; (1 &lt;&lt; COUNT_BITS) - 1;
+
+&#x2F;&#x2F;线程池处于运行状态
+private static final int RUNNING    &#x3D; -1 &lt;&lt; COUNT_BITS;
+&#x2F;&#x2F;线程池处于shutdown状态（此时线程池中仍在执行的任务不会被中止，但不接受新任务），调用shutdown方法后由RUNNING变为SHUTDOWN
+private static final int SHUTDOWN   &#x3D;  0 &lt;&lt; COUNT_BITS;
+&#x2F;&#x2F;线程池处于stop状态（此时线程池不接受新任务，清空任务队列，并会尝试中断所有活跃线程），调用shutdownNow方法后由RUNNING或SHUTDOWN变为STOP
+private static final int STOP       &#x3D;  1 &lt;&lt; COUNT_BITS;
+&#x2F;&#x2F;线程池处于tidying状态（此时线程池中，活跃线程变为0且任务队列中没有任务），SHUTDOWN或STOP状态下处理完所有任务则变为TIDYING
+private static final int TIDYING    &#x3D;  2 &lt;&lt; COUNT_BITS;
+&#x2F;&#x2F;线程池彻底终止，TIDYING状态下调用terminated方法后变为TERMINATED
+private static final int TERMINATED &#x3D;  3 &lt;&lt; COUNT_BITS;
+&#x2F;&#x2F;计算线程状态
+private static int runStateOf(int c)     &#123; return c &amp; ~CAPACITY; &#125;
+&#x2F;&#x2F;计算当前线程池中活跃线程数量
+private static int workerCountOf(int c)  &#123; return c &amp; CAPACITY; &#125;
+&#x2F;&#x2F;计算ctl值
+private static int ctlOf(int rs, int wc) &#123; return rs | wc; &#125;
+&#x2F;&#x2F;线程池所使用的阻塞队列
+private final BlockingQueue&lt;Runnable&gt; workQueue;
+&#x2F;&#x2F;线程池中包含所有线程的工作队列
+private final HashSet&lt;Worker&gt; workers &#x3D; new HashSet&lt;Worker&gt;();
+&#x2F;&#x2F;核心线程数
+private volatile int corePoolSize;
+&#x2F;&#x2F;最大线程数
+private volatile int maximumPoolSize;
+&#x2F;&#x2F;线程被回收前最大的闲置时间
+private volatile long keepAliveTime;
+&#x2F;&#x2F;拒绝策略
+private volatile RejectedExecutionHandler handler;
+&#x2F;&#x2F;创建线程使用的线程工厂
+private volatile ThreadFactory threadFactory;
+&#x2F;&#x2F;默认拒绝策略（拒绝任务并抛出异常）
+private static final RejectedExecutionHandler defaultHandler &#x3D;
+        new AbortPolicy();<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue&lt;Runnable&gt; workQueue,
+                          ThreadFactory threadFactory,
+                          RejectedExecutionHandler handler) &#123;
+    if (corePoolSize &lt; 0 ||
+        maximumPoolSize &lt;&#x3D; 0 ||
+        maximumPoolSize &lt; corePoolSize ||
+        keepAliveTime &lt; 0)
+        throw new IllegalArgumentException();
+    if (workQueue &#x3D;&#x3D; null || threadFactory &#x3D;&#x3D; null || handler &#x3D;&#x3D; null)
+        throw new NullPointerException();
+    this.corePoolSize &#x3D; corePoolSize;
+    this.maximumPoolSize &#x3D; maximumPoolSize;
+    this.workQueue &#x3D; workQueue;
+    this.keepAliveTime &#x3D; unit.toNanos(keepAliveTime);
+    this.threadFactory &#x3D; threadFactory;
+    this.handler &#x3D; handler;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>所有的构造函数都会指向这个构造方法，这个构造方法的入参含义依次为核心线程数，最大线程数，空闲时间，空闲时间单位，阻塞队列，线程工厂，拒绝策略</p>
+<h3 id="提交任务"><a href="#提交任务" class="headerlink" title="提交任务"></a>提交任务</h3><p>提交任务通常使用submit方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public Future&lt;?&gt; submit(Runnable task) &#123;
+  if (task &#x3D;&#x3D; null) throw new NullPointerException();
+  RunnableFuture&lt;Void&gt; ftask &#x3D; newTaskFor(task, null);
+  execute(ftask);
+  return ftask;
+&#125;
+
+public &lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result) &#123;
+  if (task &#x3D;&#x3D; null) throw new NullPointerException();
+  RunnableFuture&lt;T&gt; ftask &#x3D; newTaskFor(task, result);
+  execute(ftask);
+  return ftask;
+&#125;
+
+public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) &#123;
+  if (task &#x3D;&#x3D; null) throw new NullPointerException();
+  RunnableFuture&lt;T&gt; ftask &#x3D; newTaskFor(task);
+  execute(ftask);
+  return ftask;
+&#125;
+
+protected &lt;T&gt; RunnableFuture&lt;T&gt; newTaskFor(Callable&lt;T&gt; callable) &#123;
+  return new FutureTask&lt;T&gt;(callable);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>submit方法中首先将入参包装成FutureTask类，然后执行execute方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public void execute(Runnable command) &#123;
+  if (command &#x3D;&#x3D; null)
+    throw new NullPointerException();
+
+  int c &#x3D; ctl.get();
+  if (workerCountOf(c) &lt; corePoolSize) &#123;
+    if (addWorker(command, true))
+      return;
+    c &#x3D; ctl.get();
+  &#125;
+  if (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;
+    int recheck &#x3D; ctl.get();
+    if (! isRunning(recheck) &amp;&amp; remove(command))
+      reject(command);
+    else if (workerCountOf(recheck) &#x3D;&#x3D; 0)
+      addWorker(null, false);
+  &#125;
+  else if (!addWorker(command, false))
+    reject(command);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>execute方法的逻辑分为三步：</p>
+<ol>
+<li>判断工作线程数是否大于核心线程数，如果小于，则尝试新开一个线程执行该任务(不保证添加线程成功)</li>
+<li>如果工作线程数大于核心线程数并且线程池处于运行状态，则将任务加入阻塞队列中，之后继续判断线程是否处于运行状态，如果不处于运行状态，则尝试移除该任务，移除任务成功则根据拒绝策略执行拒绝逻辑；移除任务失败，则判断工作线程是否为0，为0的话添加一条非核心线程处理任务。</li>
+<li>如果工作线程数大于核心线程数但线程池不处于运行中状态或者处于运行中状态但队列已满，则尝试添加线程执行该任务，如果失败，则执行决绝策略。（非核心线程就是在这一步加入线程池中的）</li>
+</ol>
+<p>实际添加线程的逻辑在addWorker方法中，其实现如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private boolean addWorker(Runnable firstTask, boolean core) &#123;
+      retry:
+      for (;;) &#123;
+          int c &#x3D; ctl.get();
+          &#x2F;&#x2F;获取线程池当前状态
+          int rs &#x3D; runStateOf(c);
+
+          &#x2F;&#x2F;如果线程池处于SHUTDOWN之后的状态或者处于SHUTDOWN状态，但想新建线程，则直接返回false
+          if (rs &gt;&#x3D; SHUTDOWN &amp;&amp;
+              ! (rs &#x3D;&#x3D; SHUTDOWN &amp;&amp;
+                 firstTask &#x3D;&#x3D; null &amp;&amp;
+                 ! workQueue.isEmpty()))
+              return false;
+
+          &#x2F;&#x2F;自旋，直到更改ctl中的线程数成功；如果自旋过程中发现线程池已达最大容量，则返回false
+          for (;;) &#123;
+              int wc &#x3D; workerCountOf(c);
+              if (wc &gt;&#x3D; CAPACITY ||
+                  wc &gt;&#x3D; (core ? corePoolSize : maximumPoolSize))
+                  return false;
+              if (compareAndIncrementWorkerCount(c))
+                  break retry;
+              c &#x3D; ctl.get();
+              if (runStateOf(c) !&#x3D; rs)
+                  continue retry;
+          &#125;
+      &#125;
+
+      boolean workerStarted &#x3D; false;
+      boolean workerAdded &#x3D; false;
+      Worker w &#x3D; null;
+      try &#123;
+          &#x2F;&#x2F;新建worker
+          w &#x3D; new Worker(firstTask);
+          final Thread t &#x3D; w.thread;
+          if (t !&#x3D; null) &#123;
+              &#x2F;&#x2F;新增worker时加锁
+              final ReentrantLock mainLock &#x3D; this.mainLock;
+              mainLock.lock();
+              try &#123;
+                  int rs &#x3D; runStateOf(ctl.get());
+                  &#x2F;&#x2F;再次检查线程池状态，如果状态不对则抛出异常，进入finally解锁
+                  if (rs &lt; SHUTDOWN ||
+                      (rs &#x3D;&#x3D; SHUTDOWN &amp;&amp; firstTask &#x3D;&#x3D; null)) &#123;
+                      if (t.isAlive())
+                          throw new IllegalThreadStateException();
+                      &#x2F;&#x2F;添加任务
+                      workers.add(w);
+                      int s &#x3D; workers.size();
+                      if (s &gt; largestPoolSize)
+                          largestPoolSize &#x3D; s;
+                      workerAdded &#x3D; true;
+                  &#125;
+              &#125; finally &#123;
+                  mainLock.unlock();
+              &#125;
+              &#x2F;&#x2F;添加worker成功以后，调用start方法启动worker
+              if (workerAdded) &#123;
+                  t.start();
+                  workerStarted &#x3D; true;
+              &#125;
+          &#125;
+      &#125; finally &#123;
+          &#x2F;&#x2F;添加任务失败
+          if (! workerStarted)
+              addWorkerFailed(w);
+      &#125;
+      return workerStarted;
+  &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在线程池中，实际执行任务调用的是Worker类，Worker类继承了AQS，并实现了Runnable接口，其构造方法为:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">Worker(Runnable firstTask) &#123;
+  setState(-1);
+  this.firstTask &#x3D; firstTask;
+  this.thread &#x3D; getThreadFactory().newThread(this);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Worker是个不可重入的锁，并且Worker的Thread调用start方法时，执行的任务为自己，Worker的run方法如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public void run() &#123;
+  runWorker(this);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>其中runWorker方法为ThreadPoolExecutor的方法，其实现为:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">final void runWorker(Worker w) &#123;
+    Thread wt &#x3D; Thread.currentThread();
+    Runnable task &#x3D; w.firstTask;
+    w.firstTask &#x3D; null;
+    &#x2F;&#x2F;首先对worker解锁，因为刚构造worker时，worker的state为-1
+    w.unlock();
+    boolean completedAbruptly &#x3D; true;
+    try &#123;
+        &#x2F;&#x2F;循环获取任务
+        while (task !&#x3D; null || (task &#x3D; getTask()) !&#x3D; null) &#123;
+            &#x2F;&#x2F;获取任务成功则对worker进行加锁，确保worker同时只会执行一个任务
+            w.lock();
+            &#x2F;&#x2F;处于STOP状态时，需要worker中的线程打上中止标，但不会影响线程正在执行的任务
+            if ((runStateAtLeast(ctl.get(), STOP) ||
+                 (Thread.interrupted() &amp;&amp;
+                  runStateAtLeast(ctl.get(), STOP))) &amp;&amp;
+                !wt.isInterrupted())
+                wt.interrupt();
+            try &#123;
+                &#x2F;&#x2F;空实现，可继承ThreadPoolExecutor并重写该方法，在任务执行前对线程和任务进行处理
+                beforeExecute(wt, task);
+                Throwable thrown &#x3D; null;
+                try &#123;
+                    &#x2F;&#x2F;直接调用run方法
+                    task.run();
+                &#125; catch (RuntimeException x) &#123;
+                    thrown &#x3D; x; throw x;
+                &#125; catch (Error x) &#123;
+                    thrown &#x3D; x; throw x;
+                &#125; catch (Throwable x) &#123;
+                    thrown &#x3D; x; throw new Error(x);
+                &#125; finally &#123;
+                    &#x2F;&#x2F;空实现，可继承ThreadPoolExecutor并重写该方法，在任务执行后对线程和任务进行处理
+                    afterExecute(task, thrown);
+                &#125;
+            &#125; finally &#123;
+                &#x2F;&#x2F;执行完一次任务后，解锁worker
+                task &#x3D; null;
+                w.completedTasks++;
+                w.unlock();
+            &#125;
+        &#125;
+        completedAbruptly &#x3D; false;
+    &#125; finally &#123;
+        &#x2F;&#x2F;当Worker执行完所有任务，并且取不到新的任务时，调用该方法
+        processWorkerExit(w, completedAbruptly);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>runWorker方法的逻辑非常简单，首先获取任务（新建时自带任务或者从阻塞队列中获取），获取成功则执行任务。从阻塞队列中获取任务时，调用的时getTask方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private Runnable getTask() &#123;
+  boolean timedOut &#x3D; false;
+  &#x2F;&#x2F;自旋获取任务
+  for (;;) &#123;
+      int c &#x3D; ctl.get();
+      int rs &#x3D; runStateOf(c);
+
+      &#x2F;&#x2F;判断线程池状态是否正确，不正确则返回null
+      if (rs &gt;&#x3D; SHUTDOWN &amp;&amp; (rs &gt;&#x3D; STOP || workQueue.isEmpty())) &#123;
+          decrementWorkerCount();
+          return null;
+      &#125;
+
+      int wc &#x3D; workerCountOf(c);
+
+      &#x2F;&#x2F;判断阻塞队列取任务时是否进行超时判断
+      boolean timed &#x3D; allowCoreThreadTimeOut || wc &gt; corePoolSize;
+
+      &#x2F;&#x2F;如果线程池已达最大容量或者非核心线程获取任务超时，并且工作线程不为空阻塞队列为空，则返回null
+      if ((wc &gt; maximumPoolSize || (timed &amp;&amp; timedOut))
+          &amp;&amp; (wc &gt; 1 || workQueue.isEmpty())) &#123;
+          if (compareAndDecrementWorkerCount(c))
+              return null;
+          continue;
+      &#125;
+
+      try &#123;
+          &#x2F;&#x2F;如果线程数小于核心线程数，则使用take方法阻塞核心线程；否则调用poll方法，并设置超时时间，如果过了超时时间还没有取到任务，则返回
+          Runnable r &#x3D; timed ?
+              workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+              workQueue.take();
+          if (r !&#x3D; null)
+              return r;
+          timedOut &#x3D; true;
+      &#125; catch (InterruptedException retry) &#123;
+          timedOut &#x3D; false;
+      &#125;
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，对于非核心线程，如果在有效存活时间内取不到任务，则会直接返回null，导致runWorker中跳出循环，并销毁线程。</p>
+<p>从上面的代码可以看出，当向线程池submit一个任务时，会优先添加核心线程处理任务，如果核心线程已满，则优先加入阻塞队列中，如果阻塞队列也放不下，则会新建线程（带超时时间）处理任务；如果到达线程池最大线程数，则会执行拒绝策略。</p>
+<h3 id="拒绝策略"><a href="#拒绝策略" class="headerlink" title="拒绝策略"></a>拒绝策略</h3><p>线程池有四种拒绝策略：</p>
+<ol>
+<li>AbortPolicy：丢弃任务并抛出RejectedExecutionException异常</li>
+<li>DiscardPolicy：丢弃提交的任务，并且不抛出异常</li>
+<li>DiscardOldestPolicy：丢弃阻塞队列中头部的任务，重新提交被拒绝的任务</li>
+<li>CallerRunsPolicy：由调用线程执行任务</li>
+</ol>
+<h3 id="tomcat线程池"><a href="#tomcat线程池" class="headerlink" title="tomcat线程池"></a>tomcat线程池</h3><p>tomcat线程池的核心类为StandardThreadExecutor，其内部构造了一个org.apache.tomcat.util.threads.ThreadPoolExecutor类（继承自JDK的ThreadPoolExecutor），并且使用了tomcat自定义的任务队列TaskQueue。<br>在TaskQueue的offer方法中，如果新增任务时，无空闲线程并且tomcat的线程数小于最大线程数，则会返回false</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public boolean offer(Runnable o) &#123;
+    if (parent&#x3D;&#x3D;null) return super.offer(o);
+    if (parent.getPoolSize() &#x3D;&#x3D; parent.getMaximumPoolSize()) return super.offer(o);
+    if (parent.getSubmittedCount()&lt;&#x3D;(parent.getPoolSize())) return super.offer(o);
+    if (parent.getPoolSize()&lt;parent.getMaximumPoolSize()) return false;
+    return super.offer(o);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>由于org.apache.tomcat.util.threads.ThreadPoolExecutor的execute方法与JDK中的逻辑一样，因此在进行</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">if (isRunning(c) &amp;&amp; workQueue.offer(command))<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>判断时，workQueue.offer会返回false，也就是说，向tomcat中的线程池中添加任务，若核心线程已满，会优先新建非核心线程执行任务，等到达最大线程容量的时候才向等待队列中插入任务。<br>JDK和tomcat的线程池对于核心线程已满的情况下，新增任务的处理逻辑不同是因为JDK中的线程池处理的任务是CPU密集型任务，对新建线程消耗的资源更敏感；而tomcat作为服务器，处理的大部分是IO密集型任务，对于新建线程消耗的资源没有那么敏感，并且优先新建线程处理任务也能提高服务器的响应能力。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                                    <span class="chip bg-color">JDK源码</span>
+                                </a>
+                            
+                                <a href="/tags/ThreadPoolExecutor/">
+                                    <span class="chip bg-color">ThreadPoolExecutor</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/06/26/ThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ThreadPoolExecutor源码解析">
+                        
+                        <span class="card-title">ThreadPoolExecutor源码解析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            本文主要基于JDK1.8对ThreadPoolExecutor源码进行解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                    JDK源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">JDK源码</span>
+                    </a>
+                    
+                    <a href="/tags/ThreadPoolExecutor/">
+                        <span class="chip bg-color">ThreadPoolExecutor</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/06/19/ConcurrentHashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ConcurrentHashMap源码解析">
+                        
+                        <span class="card-title">ConcurrentHashMap源码解析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            本文主要基于JDK1.8对ConcurrentHashMap源码进行解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-19
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JDK%E6%BA%90%E7%A0%81/" class="post-category">
+                                    JDK源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ConcurrentHashMap/">
+                        <span class="chip bg-color">ConcurrentHashMap</span>
+                    </a>
+                    
+                    <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">JDK源码</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Xu Tao</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

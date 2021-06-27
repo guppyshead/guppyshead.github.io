@@ -244,7 +244,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-06-20
+                    2021-06-26
                 </div>
                 
 
@@ -295,7 +295,7 @@ transient volatile Node&lt;K,V&gt;[] table;
 private transient volatile Node&lt;K,V&gt;[] nextTable;
 &#x2F;&#x2F;基础数组长度（实际数组长度可能比这个值大）
 private transient volatile long baseCount;
-&#x2F;&#x2F;值为-1时代表正在初始化，其他负数代表数组正在进行扩容，扩容时高16位与哈希桶数组大小有关，低16位为扩容的线程数+1
+&#x2F;&#x2F;值为-1时代表正在初始化，其他负数代表数组正在进行扩容，扩容时高16位与哈希桶数组大小有关，低16位为扩容的线程数+1;当sizeCtl大于0时，则表示当前哈希桶数组所能容纳的最大元素个数（0.75*数组长度）
 private transient volatile int sizeCtl;
 &#x2F;&#x2F;数组扩容时还未被分配扩容线程的最大index
 private transient volatile int transferIndex;
@@ -402,7 +402,7 @@ static final int RESERVED  &#x3D; -3;<span aria-hidden="true" class="line-number
         &#125;
       &#125;
       if (binCount !&#x3D; 0) &#123;
-        &#x2F;&#x2F;插入成功后，判断是否需要将链表变为数组
+        &#x2F;&#x2F;插入成功后，判断是否需要将链表变为红黑树
         if (binCount &gt;&#x3D; TREEIFY_THRESHOLD)
           treeifyBin(tab, i);
         if (oldVal !&#x3D; null)
@@ -641,8 +641,13 @@ private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) &#
       &#125;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>插入元素后，如果需要将链表转化为红黑树，则会调用treeifyBin方法，treeifyBin方法中同HashMap方法中一样，判断了数组长度是否小于64，如果小于64，则优先扩容</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">if ((n &#x3D; tab.length) &lt; MIN_TREEIFY_CAPACITY)
+  &#x2F;&#x2F;tryPresize内部调用了transfer方法
+  tryPresize(n &lt;&lt; 1);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>在putVal方法的最后，调用了addCount方法将ConcurrentHashMap的size+1，其实现如下:</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private final void addCount(long x, int check) &#123;
+    &#x2F;&#x2F;s代表执行此次addCount后ConcurrentHashMap的长度
     CounterCell[] as; long b, s;
     if ((as &#x3D; counterCells) !&#x3D; null ||
         !U.compareAndSwapLong(this, BASECOUNT, b &#x3D; baseCount, s &#x3D; b + x)) &#123;
@@ -664,21 +669,25 @@ private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) &#
         while (s &gt;&#x3D; (long)(sc &#x3D; sizeCtl) &amp;&amp; (tab &#x3D; table) !&#x3D; null &amp;&amp;
                (n &#x3D; tab.length) &lt; MAXIMUM_CAPACITY) &#123;
             int rs &#x3D; resizeStamp(n);
+            &#x2F;&#x2F;sc小于0则代表在扩容，需要判断是否需要帮助扩容
             if (sc &lt; 0) &#123;
+                &#x2F;&#x2F;if中第一个条件代表当前线程操作的数组和目前ConcurrentHashMap扩容的数组不是同一个数组（大小一致），第二和第三个条件为bug（同上文transfer方法），实际上是用来判断数组是否已经扩容完成或是否达到最大扩容线程，第四个判断条件代表数组已扩容完成，如果有任一条件为真，则跳出循环
                 if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) !&#x3D; rs || sc &#x3D;&#x3D; rs + 1 ||
                     sc &#x3D;&#x3D; rs + MAX_RESIZERS || (nt &#x3D; nextTable) &#x3D;&#x3D; null ||
                     transferIndex &lt;&#x3D; 0)
                     break;
+                &#x2F;&#x2F;如果需要扩容，则当前线程帮助扩容
                 if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
                     transfer(tab, nt);
             &#125;
+            &#x2F;&#x2F;到这一步可以确定sc大于0，此时sc代表ConcurrentHashMap的容量，而while中判断了s&gt;sc，则说明当前ConcurrentHashMap的容量已经达到了上限，需要进行扩容
             else if (U.compareAndSwapInt(this, SIZECTL, sc,
                                          (rs &lt;&lt; RESIZE_STAMP_SHIFT) + 2))
                 transfer(tab, null);
             s &#x3D; sumCount();
         &#125;
     &#125;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>方法的执行逻辑为用baseCount来保存ConcurrentHashMap的size，但是如果baseCount的cas操作竞争很激烈，则用CounterCell来保存每次每次putVal时要加的size值，每个线程都会通过getProbe方法获取在CounterCell数组中对应的位置，并将本线程要加的size值放入该位置，如果该位置有值，则会继续寻找数组中为空的元素进行操作</p>
 <p>获取ConcurrentHashMap的size调用的是sumCount方法</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public int size() &#123;
@@ -760,30 +769,29 @@ private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) &#
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/06/19/ConcurrentHashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+                <a href="/2021/06/26/ThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ConcurrentHashMap源码解析">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ThreadPoolExecutor源码解析">
                         
-                        <span class="card-title">ConcurrentHashMap源码解析</span>
+                        <span class="card-title">ThreadPoolExecutor源码解析</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            本文主要基于JDK1.8对ConcurrentHashMap源码进行解析
+                            本文主要基于JDK1.8对ThreadPoolExecutor源码进行解析
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-19
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-06-26
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -796,16 +804,15 @@ private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) &#
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/ConcurrentHashMap/">
-                        <span class="chip bg-color">ConcurrentHashMap</span>
-                    </a>
-                    
                     <a href="/tags/JDK%E6%BA%90%E7%A0%81/">
                         <span class="chip bg-color">JDK源码</span>
+                    </a>
+                    
+                    <a href="/tags/ThreadPoolExecutor/">
+                        <span class="chip bg-color">ThreadPoolExecutor</span>
                     </a>
                     
                 </div>
