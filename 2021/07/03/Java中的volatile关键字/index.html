@@ -240,7 +240,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-03
+                    2021-07-10
                 </div>
                 
 
@@ -282,7 +282,7 @@
         return object;
     &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>在代码B处，实际有三个指令:1.在堆内存中开辟一块空间给Object，2.将object指向该空间，3.执行Object的<init>方法。其中第二步和第三步并没有先后顺序，有可能会发生指令重排，先执行第二步，然后执行第三步，在执行第三步之前Objects.isnull(object)返回的是false，因为object已经指向了堆内存中的一块空间,如果其他线程在第二步后执行到代码A处，则会返回一个没有执行<init>方法的对象，使用这个对象会报空指针异常。<br>但是如果给object变量加上volatile关键字，则能禁止代码B处的指令重排，因此volatile关键字可以保证变量操作的有序性</p>
+<p>在代码B处，实际有三个指令:1.在堆内存中开辟一块空间给Object，2.将object指向该空间，3.执行Object的init方法。其中第二步和第三步并没有先后顺序，有可能会发生指令重排，先执行第二步，然后执行第三步，在执行第三步之前Objects.isnull(object)返回的是false，因为object已经指向了堆内存中的一块空间,如果其他线程在第二步后执行到代码A处，则会返回一个没有执行init方法的对象，使用这个对象会报空指针异常。<br>但是如果给object变量加上volatile关键字，则能禁止代码B处的指令重排，因此volatile关键字可以保证变量操作的有序性</p>
 <pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">private static volatile Object object;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <h4 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h4><p>在多线程环境下，一系列的操作要么同时成功，要么同时失败，则可以称这一系列的操作有原子性(不可分割)。volatile明显不能保证这种操作。当然也有例外，在32位操作系统的JVM中，CPU对于long和double类型的变量操作实际是分为两步来进行的，因为CPU一次只能操作32位数据，而long和double类型的变量有64位，此时对变量添加volatile关键字能保证变量操作的原子性。</p>
