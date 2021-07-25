@@ -240,7 +240,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-07-17
+                    2021-07-25
                 </div>
                 
 
@@ -391,6 +391,22 @@ public class HugeFileSort &#123;
         return resultFileName;
     &#125;
 
+    &#x2F;&#x2F;A)
+    public static RandomAccessFile reNameFile(RandomAccessFile file,String newName) throws IOException &#123;
+        RandomAccessFile reNameFile &#x3D; new RandomAccessFile(newName,&quot;rw&quot;);
+        file.seek(0);
+        FileChannel srcFc &#x3D; file.getChannel();
+        FileChannel destFc &#x3D; reNameFile.getChannel();
+        ByteBuffer buffer &#x3D; ByteBuffer.allocate(1024);
+        while(srcFc.read(buffer) !&#x3D; -1)&#123;
+            buffer.flip();
+            destFc.write(buffer);
+            buffer.clear();
+        &#125;
+        file.close();
+        return reNameFile;
+    &#125;
+
     public static Boolean isNotEmpty(String str) &#123;
         return str !&#x3D; null &amp;&amp; str.length() &gt; 0;
     &#125;
@@ -401,8 +417,9 @@ public class HugeFileSort &#123;
         wirteFile(fileName);
         mergeFile(splitFile(fileName));
     &#125;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-注:在对文件进行合并的时候，也可以不构造数组而使用归并</li>
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+注1:在对文件进行合并的时候，也可以不构造数组而使用归并<br>注2:在代码A处，进行文件复制时使用了文件的NIO，通过把源文件Channel数据写入buffer，在目标文件Channel读取buffer来实现。在网上还流传着另一种方式，直接通过Channel的transferTo方法来复制文件<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">srcFc.transferTo(0 , srcFc.size(), destFc);<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+这种方式对于大文件来说是不安全的，因为Channel的size是有上限的（大概是1.5G-2G），如果文件很大的话，文件只会被复制一部分。</li>
 </ol>
 
                 
@@ -460,48 +477,46 @@ public class HugeFileSort &#123;
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/07/17/%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/">
+                <a href="/2021/07/25/Spring%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="零拷贝技术">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Spring源码解析(一)">
                         
-                        <span class="card-title">零拷贝技术</span>
+                        <span class="card-title">Spring源码解析(一)</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            零拷贝技术
+                            Spring源码解析——资源文件的读取
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-07-17
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-07-25
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%9D%82%E8%B0%88/" class="post-category">
-                                    杂谈
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                    Spring源码
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">
-                        <span class="chip bg-color">零拷贝</span>
+                    <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">Spring源码</span>
                     </a>
                     
                 </div>

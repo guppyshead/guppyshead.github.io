@@ -1,0 +1,974 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Spring源码解析(一), ">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Spring源码解析(一) | </title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Spring源码解析(一)</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="container content">
+
+    
+    <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                                <span class="chip bg-color">Spring源码</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                Spring源码
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-07-25
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2021-07-25
+                </div>
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>在开发Java项目的过程当中，适当地使用已有框架能够大大减少工作量。目前大部分Java项目都使用Spring对项目的类对象进行管理，本文主要探究Spring如何构造类对象，并对类对象的属性进行注入。</p>
+<h4 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h4><p>通常，我们使用Spring时，都会使用ApplicationContext作为容器，它有很多实现类，为了方便研究Spring，这里使用ClassPathXmlApplicationContext来举例</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">ClassPathXmlApplicationContext applicationContext &#x3D; new ClassPathXmlApplicationContext(config);
+Object bean &#x3D; applicationContext.getBean(beanName);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>上面这行代码即可启动一个Spring项目，第二行的bean即为Spring管理的类对象(可以将类型强转成需要的类)。ClassPathXmlApplicationContext的构造方法如下:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public ClassPathXmlApplicationContext(String configLocation) throws BeansException &#123;
+	this(new String[] &#123;configLocation&#125;, true, null);
+&#125;
+
+ public ClassPathXmlApplicationContext(
+		String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
+		throws BeansException &#123;
+
+	super(parent);
+   &#x2F;&#x2F;设置xml配置文件位置
+	setConfigLocations(configLocations);
+   &#x2F;&#x2F;启动Spring
+	if (refresh) &#123;
+		refresh();
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在构造方法中，首先设置了配置文件的位置，然后启动Spring项目。setConfigLocations方法如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public void setConfigLocations(@Nullable String... locations) &#123;
+	if (locations !&#x3D; null) &#123;
+		Assert.noNullElements(locations, &quot;Config locations must not be null&quot;);
+		this.configLocations &#x3D; new String[locations.length];
+		for (int i &#x3D; 0; i &lt; locations.length; i++) &#123;
+			this.configLocations[i] &#x3D; resolvePath(locations[i]).trim();
+		&#125;
+	&#125;
+	else &#123;
+		this.configLocations &#x3D; null;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>真正启动Spring容器的是refresh方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public void refresh() throws BeansException, IllegalStateException &#123;
+	synchronized (this.startupShutdownMonitor) &#123;
+     &#x2F;&#x2F;Spring5.3加入的StartupStep，用来记录Spring容器启动步骤中的一些指标
+		StartupStep contextRefresh &#x3D; this.applicationStartup.start(&quot;spring.context.refresh&quot;);
+
+		&#x2F;&#x2F;准备刷新上下文的环境
+		prepareRefresh();
+
+		&#x2F;&#x2F;初始化BeanFactory，并读取xml
+		ConfigurableListableBeanFactory beanFactory &#x3D; obtainFreshBeanFactory();
+
+		&#x2F;&#x2F;对BeanFactory进行一些增强
+		prepareBeanFactory(beanFactory);
+
+		try &#123;
+			&#x2F;&#x2F;空实现，主要是为了让开发人员可以在context的子类中对beanFactory进行功能的增强
+			postProcessBeanFactory(beanFactory);
+
+       &#x2F;&#x2F;同第一句
+			StartupStep beanPostProcess &#x3D; this.applicationStartup.start(&quot;spring.context.beans.post-process&quot;);
+			&#x2F;&#x2F;激活所有BeanFactory处理器
+			invokeBeanFactoryPostProcessors(beanFactory);
+
+			&#x2F;&#x2F;注册所有bean的处理器，这里只是注册，并不会实际调用postProcessBeforeInitialization和postProcessAfterInitialization方法
+			registerBeanPostProcessors(beanFactory);
+			beanPostProcess.end();
+
+			&#x2F;&#x2F;初始化Message源，主要是为了国际化的处理
+			initMessageSource();
+
+			&#x2F;&#x2F;初始化消息广播器，广播器的beanName为applicationEventMulticaster
+			initApplicationEventMulticaster();
+
+			&#x2F;&#x2F;空实现，可以在这里实现一些自定义的bean
+			onRefresh();
+
+			&#x2F;&#x2F;在注册的bean中查找消息监听者，并注册
+			registerListeners();
+
+			&#x2F;&#x2F;实例化所有非非懒加载的bean
+			finishBeanFactoryInitialization(beanFactory);
+
+			&#x2F;&#x2F;完成refresh
+			finishRefresh();
+		&#125;
+
+		catch (BeansException ex) &#123;
+			if (logger.isWarnEnabled()) &#123;
+				logger.warn(&quot;Exception encountered during context initialization - &quot; +
+						&quot;cancelling refresh attempt: &quot; + ex);
+			&#125;
+
+			&#x2F;&#x2F; Destroy already created singletons to avoid dangling resources.
+			destroyBeans();
+
+			&#x2F;&#x2F; Reset &#39;active&#39; flag.
+			cancelRefresh(ex);
+
+			&#x2F;&#x2F; Propagate exception to caller.
+			throw ex;
+		&#125;
+
+		finally &#123;
+			&#x2F;&#x2F; Reset common introspection caches in Spring&#39;s core, since we
+			&#x2F;&#x2F; might not ever need metadata for singleton beans anymore...
+			resetCommonCaches();
+			contextRefresh.end();
+		&#125;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="环境参数验证"><a href="#环境参数验证" class="headerlink" title="环境参数验证"></a>环境参数验证</h4><p>Spring容器初始化的过程中，第一步就是准备刷新的上下文环境，其实现为:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected void prepareRefresh() &#123;
+	this.startupDate &#x3D; System.currentTimeMillis();
+	this.closed.set(false);
+	this.active.set(true);
+
+	if (logger.isDebugEnabled()) &#123;
+		if (logger.isTraceEnabled()) &#123;
+			logger.trace(&quot;Refreshing &quot; + this);
+		&#125;
+		else &#123;
+			logger.debug(&quot;Refreshing &quot; + getDisplayName());
+		&#125;
+	&#125;
+
+   &#x2F;&#x2F;空实现，在这一步可以添加对一些自定义的环境参数的验证
+	initPropertySources();
+
+  &#x2F;&#x2F;验证必要的环境参数
+	getEnvironment().validateRequiredProperties();
+
+	if (this.earlyApplicationListeners &#x3D;&#x3D; null) &#123;
+		this.earlyApplicationListeners &#x3D; new LinkedHashSet&lt;&gt;(this.applicationListeners);
+	&#125;
+	else &#123;
+		this.applicationListeners.clear();
+		this.applicationListeners.addAll(this.earlyApplicationListeners);
+	&#125;
+
+	this.earlyApplicationEvents &#x3D; new LinkedHashSet&lt;&gt;();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个方法主要就是对环境参数进行了验证。</p>
+<h4 id="获取BeanFactory"><a href="#获取BeanFactory" class="headerlink" title="获取BeanFactory"></a>获取BeanFactory</h4><p>ApplicationContext是对BeanFactory功能的增强，因此也少不了获取BeanFactory这一步，其主要是通过obtainFreshBeanFactory方法来实现的</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected ConfigurableListableBeanFactory obtainFreshBeanFactory() &#123;
+	refreshBeanFactory();
+	return getBeanFactory();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中refreshBeanFactory方法是在AbstractRefreshableApplicationContext中</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected final void refreshBeanFactory() throws BeansException &#123;
+   &#x2F;&#x2F;如果存在BeanFactory
+	if (hasBeanFactory()) &#123;
+     &#x2F;&#x2F;摧毁所有已注册的bean
+		destroyBeans();
+     &#x2F;&#x2F;关闭已存在的BeanFactory
+		closeBeanFactory();
+	&#125;
+	try &#123;
+     &#x2F;&#x2F;创建BeanFactory
+		DefaultListableBeanFactory beanFactory &#x3D; createBeanFactory();
+     &#x2F;&#x2F;设置serializationId
+		beanFactory.setSerializationId(getId());
+     &#x2F;&#x2F;定制化BeanFactory
+		customizeBeanFactory(beanFactory);
+     &#x2F;&#x2F;加载xml中的Bean定义
+		loadBeanDefinitions(beanFactory);
+		this.beanFactory &#x3D; beanFactory;
+	&#125;
+	catch (IOException ex) &#123;
+		throw new ApplicationContextException(&quot;I&#x2F;O error parsing bean definition source for &quot; + getDisplayName(), ex);
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>获取BeanFactory的逻辑还是很清晰的，如果有BeanFactory，则摧毁已经加载的Bean和BeanFactory；然后新建BeanFactory并设置serializationId，方便序列化；在定制化BeanFactory中，实际上是给两个参数赋值</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) &#123;
+	if (this.allowBeanDefinitionOverriding !&#x3D; null) &#123;
+		beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
+	&#125;
+	if (this.allowCircularReferences !&#x3D; null) &#123;
+		beanFactory.setAllowCircularReferences(this.allowCircularReferences);
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中，allowBeanDefinitionOverriding代表是否允许覆盖同名称的bean，allowCircularReferences代表是否允许循环依赖，这两个属性就可以在上面prepareRefresh方法中的initPropertySources中进行复制(子类重写方法)</p>
+<h4 id="加载xml中的Bean定义"><a href="#加载xml中的Bean定义" class="headerlink" title="加载xml中的Bean定义"></a>加载xml中的Bean定义</h4><p>在refreshBeanFactory方法中，最重要的就是加载xml中的Bean定义(loadBeanDefinitions)，这个方法的实现在AbstractXmlApplicationContext中:</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException &#123;
+	&#x2F;&#x2F;创建读取xml定义的reader
+	XmlBeanDefinitionReader beanDefinitionReader &#x3D; new XmlBeanDefinitionReader(beanFactory);
+
+	&#x2F;&#x2F;设置环境参数以及资源加载器
+	beanDefinitionReader.setEnvironment(this.getEnvironment());
+	beanDefinitionReader.setResourceLoader(this);
+   &#x2F;&#x2F;EntityResolver是用来确定如何解析xml文件(DTD模式或者XSD模式)
+	beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+
+	&#x2F;&#x2F;初始化reader，在这一步可以重写子类方法，来对reader的功能进行增强
+	initBeanDefinitionReader(beanDefinitionReader);
+   &#x2F;&#x2F;读取bean定义
+	loadBeanDefinitions(beanDefinitionReader);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>实际读取bean定义的方法还在loadBeanDefinitions(注意这个入参是reader，上面方法的入参是BeanFactory)中</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException &#123;
+	Resource[] configResources &#x3D; getConfigResources();
+	if (configResources !&#x3D; null) &#123;
+		reader.loadBeanDefinitions(configResources);
+	&#125;
+	String[] configLocations &#x3D; getConfigLocations();
+	if (configLocations !&#x3D; null) &#123;
+		reader.loadBeanDefinitions(configLocations);
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里的getConfigLocations获取的就是在ClassPathXmlApplicationContext构造方法里调用setConfigLocations方法设置的配置文件的location，继续查看reader的loadBeanDefinitions方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException &#123;
+	Assert.notNull(locations, &quot;Location array must not be null&quot;);
+	int count &#x3D; 0;
+	for (String location : locations) &#123;
+		count +&#x3D; loadBeanDefinitions(location);
+	&#125;
+	return count;
+&#125;
+
+ public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException &#123;
+	return loadBeanDefinitions(location, null);
+&#125;
+
+ public int loadBeanDefinitions(String location, @Nullable Set&lt;Resource&gt; actualResources) throws BeanDefinitionStoreException &#123;
+	ResourceLoader resourceLoader &#x3D; getResourceLoader();
+	if (resourceLoader &#x3D;&#x3D; null) &#123;
+		throw new BeanDefinitionStoreException(
+				&quot;Cannot load bean definitions from location [&quot; + location + &quot;]: no ResourceLoader available&quot;);
+	&#125;
+
+	if (resourceLoader instanceof ResourcePatternResolver) &#123;
+		try &#123;
+			Resource[] resources &#x3D; ((ResourcePatternResolver) resourceLoader).getResources(location);
+			int count &#x3D; loadBeanDefinitions(resources);
+			if (actualResources !&#x3D; null) &#123;
+				Collections.addAll(actualResources, resources);
+			&#125;
+			if (logger.isTraceEnabled()) &#123;
+				logger.trace(&quot;Loaded &quot; + count + &quot; bean definitions from location pattern [&quot; + location + &quot;]&quot;);
+			&#125;
+			return count;
+		&#125;
+		catch (IOException ex) &#123;
+			throw new BeanDefinitionStoreException(
+					&quot;Could not resolve bean definition resource pattern [&quot; + location + &quot;]&quot;, ex);
+		&#125;
+	&#125;
+	else &#123;
+		Resource resource &#x3D; resourceLoader.getResource(location);
+		int count &#x3D; loadBeanDefinitions(resource);
+		if (actualResources !&#x3D; null) &#123;
+			actualResources.add(resource);
+		&#125;
+		if (logger.isTraceEnabled()) &#123;
+			logger.trace(&quot;Loaded &quot; + count + &quot; bean definitions from location [&quot; + location + &quot;]&quot;);
+		&#125;
+		return count;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里的逻辑主要是将location指向的配置文件封装成Resource，供Spring容器使用，然后调用loadBeanDefinitions(入参为封装后的resource)方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException &#123;
+      return this.loadBeanDefinitions(new EncodedResource(resource));
+  &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>在loadBeanDefinitions方法中最终调用的是doLoadBeanDefinitions方法，在doLoadBeanDefinitions方法中，有这样两句代码</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">Document doc &#x3D; this.doLoadDocument(inputSource, resource);
+int count &#x3D; this.registerBeanDefinitions(doc, resource);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>第一句是根据resource获取Document文件，第二句则是注册bean定义</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException &#123;
+    BeanDefinitionDocumentReader documentReader &#x3D; this.createBeanDefinitionDocumentReader();
+    int countBefore &#x3D; this.getRegistry().getBeanDefinitionCount();
+    documentReader.registerBeanDefinitions(doc, this.createReaderContext(resource));
+    return this.getRegistry().getBeanDefinitionCount() - countBefore;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>注册bean定义最终调用的方法为</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">protected void doRegisterBeanDefinitions(Element root) &#123;
+    BeanDefinitionParserDelegate parent &#x3D; this.delegate;
+    this.delegate &#x3D; this.createDelegate(this.getReaderContext(), root, parent);
+    if (this.delegate.isDefaultNamespace(root)) &#123;
+        String profileSpec &#x3D; root.getAttribute(&quot;profile&quot;);
+        if (StringUtils.hasText(profileSpec)) &#123;
+            String[] specifiedProfiles &#x3D; StringUtils.tokenizeToStringArray(profileSpec, &quot;,; &quot;);
+            if (!this.getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) &#123;
+                if (this.logger.isDebugEnabled()) &#123;
+                    this.logger.debug(&quot;Skipped XML bean definition file due to specified profiles [&quot; + profileSpec + &quot;] not matching: &quot; + this.getReaderContext().getResource());
+                &#125;
+
+                return;
+            &#125;
+        &#125;
+    &#125;
+
+    this.preProcessXml(root);
+    this.parseBeanDefinitions(root, this.delegate);
+    this.postProcessXml(root);
+    this.delegate &#x3D; parent;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中，preProcessXml和postProcessXml都是空实现，可以在里面实现自定义的逻辑，真正进行bean标签的解析是parseBeanDefinitions方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) &#123;
+    if (delegate.isDefaultNamespace(root)) &#123;
+        NodeList nl &#x3D; root.getChildNodes();
+
+        for(int i &#x3D; 0; i &lt; nl.getLength(); ++i) &#123;
+            Node node &#x3D; nl.item(i);
+            if (node instanceof Element) &#123;
+                Element ele &#x3D; (Element)node;
+                if (delegate.isDefaultNamespace(ele)) &#123;
+                    this.parseDefaultElement(ele, delegate);
+                &#125; else &#123;
+                    delegate.parseCustomElement(ele);
+                &#125;
+            &#125;
+        &#125;
+    &#125; else &#123;
+        delegate.parseCustomElement(root);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                                    <span class="chip bg-color">Spring源码</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/07/25/Spring%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="Spring源码解析(一)">
+                        
+                        <span class="card-title">Spring源码解析(一)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Spring源码解析——资源文件的读取
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-07-25
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                    Spring源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">Spring源码</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/07/17/%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="零拷贝技术">
+                        
+                        <span class="card-title">零拷贝技术</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            零拷贝技术
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-07-17
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%9D%82%E8%B0%88/" class="post-category">
+                                    杂谈
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">
+                        <span class="chip bg-color">零拷贝</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Xu Tao</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
