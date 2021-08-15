@@ -1,0 +1,866 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Spring源码解析(三), ">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Spring源码解析(三) | </title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Spring源码解析(三)</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="container content">
+
+    
+    <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                                <span class="chip bg-color">Spring源码</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                Spring源码
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2021-08-14
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2021-08-15
+                </div>
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>在Spring中，除了alias、bean、import、beans四种类型的默认标签，剩下的都属于自定义标签，对于自定义标签，Spring解析的逻辑和默认标签的解析逻辑并不相同。本文主要探讨自定义标签的解析。</p>
+<h3 id="自定义标签解析"><a href="#自定义标签解析" class="headerlink" title="自定义标签解析"></a>自定义标签解析</h3><p>自定义标签的解析使用的是BeanDefinitionParserDelegate的parseCustomElement方法</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) &#123;
+   &#x2F;&#x2F;解析nameSpace
+	String namespaceUri &#x3D; getNamespaceURI(ele);
+	if (namespaceUri &#x3D;&#x3D; null) &#123;
+		return null;
+	&#125;
+   &#x2F;&#x2F;根据nameSpace查找处理器
+	NamespaceHandler handler &#x3D; this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
+	if (handler &#x3D;&#x3D; null) &#123;
+		error(&quot;Unable to locate Spring NamespaceHandler for XML schema namespace [&quot; + namespaceUri + &quot;]&quot;, ele);
+		return null;
+	&#125;
+   &#x2F;&#x2F;处理自定义标签
+	return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>解析自定义标签时，首先会根据标签获取命名空间，命名空间通常是在xml根节点声明的</p>
+<pre class="line-numbers language-XML" data-language="XML"><code class="language-XML">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;
+       xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;
+       xmlns:aop&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;aop&quot;
+       xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans.xsd
+            http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;aop http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;aop&#x2F;spring-aop-3.0.xsd&quot;&gt;
+    &lt;aop:aspectj-autoproxy&#x2F;&gt;
+&lt;&#x2F;beans&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中xmls:aop指定的是处理器的地址，而xsi:schemaLocation中指定的则是约束文件的地址。<br>执行parseCustomElement方法时，getNamespaceURI方法取到的是处理器的地址，得到handler地址后，会从readerContext的getnamespaceHandlerResolver获取所有的handler，然后选出namespace对应的handler来处理xml文件<br>readerContext构造时会需要传入DefaultNamespaceHandlerResolver，而DefaultNamespaceHandlerResolver构造时默认的handler的地址为 META-INF/spring.handlers</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public static final String DEFAULT_HANDLER_MAPPINGS_LOCATION &#x3D; &quot;META-INF&#x2F;spring.handlers&quot;;
+
+  public DefaultNamespaceHandlerResolver(@Nullable ClassLoader classLoader) &#123;
+		this(classLoader, DEFAULT_HANDLER_MAPPINGS_LOCATION);
+	&#125;
+
+  public DefaultNamespaceHandlerResolver(@Nullable ClassLoader classLoader, String handlerMappingsLocation) &#123;
+		Assert.notNull(handlerMappingsLocation, &quot;Handler mappings location must not be null&quot;);
+		this.classLoader &#x3D; (classLoader !&#x3D; null ? classLoader : ClassUtils.getDefaultClassLoader());
+		this.handlerMappingsLocation &#x3D; handlerMappingsLocation;
+	&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>例如aop标签的spring.handlers的配置如下</p>
+<pre class="line-numbers language-none"><code class="language-none">http\:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;aop&#x3D;org.springframework.aop.config.AopNamespaceHandler<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>调用resolve解析handler时，会调用handlerMappings方法获取已经配置的所有handler</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public NamespaceHandler resolve(String namespaceUri) &#123;
+   &#x2F;&#x2F;获取handlerMappings
+	Map&lt;String, Object&gt; handlerMappings &#x3D; getHandlerMappings();
+	Object handlerOrClassName &#x3D; handlerMappings.get(namespaceUri);
+	if (handlerOrClassName &#x3D;&#x3D; null) &#123;
+		return null;
+	&#125;
+	else if (handlerOrClassName instanceof NamespaceHandler) &#123;
+		return (NamespaceHandler) handlerOrClassName;
+	&#125;
+	else &#123;
+		String className &#x3D; (String) handlerOrClassName;
+		try &#123;
+			Class&lt;?&gt; handlerClass &#x3D; ClassUtils.forName(className, this.classLoader);
+			if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) &#123;
+				throw new FatalBeanException(&quot;Class [&quot; + className + &quot;] for namespace [&quot; + namespaceUri +
+						&quot;] does not implement the [&quot; + NamespaceHandler.class.getName() + &quot;] interface&quot;);
+			&#125;
+			NamespaceHandler namespaceHandler &#x3D; (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+			namespaceHandler.init();
+			handlerMappings.put(namespaceUri, namespaceHandler);
+			return namespaceHandler;
+		&#125;
+		catch (ClassNotFoundException ex) &#123;
+			throw new FatalBeanException(&quot;Could not find NamespaceHandler class [&quot; + className +
+					&quot;] for namespace [&quot; + namespaceUri + &quot;]&quot;, ex);
+		&#125;
+		catch (LinkageError err) &#123;
+			throw new FatalBeanException(&quot;Unresolvable class definition for NamespaceHandler class [&quot; +
+					className + &quot;] for namespace [&quot; + namespaceUri + &quot;]&quot;, err);
+		&#125;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>getHandlerMappings方法实现如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> private Map&lt;String, Object&gt; getHandlerMappings() &#123;
+	Map&lt;String, Object&gt; handlerMappings &#x3D; this.handlerMappings;
+	if (handlerMappings &#x3D;&#x3D; null) &#123;
+		synchronized (this) &#123;
+			handlerMappings &#x3D; this.handlerMappings;
+			if (handlerMappings &#x3D;&#x3D; null) &#123;
+				if (logger.isTraceEnabled()) &#123;
+					logger.trace(&quot;Loading NamespaceHandler mappings from [&quot; + this.handlerMappingsLocation + &quot;]&quot;);
+				&#125;
+				try &#123;
+           &#x2F;&#x2F;获取 META-INF&#x2F;spring.handlers 文件中配置的handler并存储在Properties对象中
+					Properties mappings &#x3D;
+							PropertiesLoaderUtils.loadAllProperties(this.handlerMappingsLocation, this.classLoader);
+					if (logger.isTraceEnabled()) &#123;
+						logger.trace(&quot;Loaded NamespaceHandler mappings: &quot; + mappings);
+					&#125;
+					handlerMappings &#x3D; new ConcurrentHashMap&lt;&gt;(mappings.size());
+					CollectionUtils.mergePropertiesIntoMap(mappings, handlerMappings);
+					this.handlerMappings &#x3D; handlerMappings;
+				&#125;
+				catch (IOException ex) &#123;
+					throw new IllegalStateException(
+							&quot;Unable to load NamespaceHandler mappings from location [&quot; + this.handlerMappingsLocation + &quot;]&quot;, ex);
+				&#125;
+			&#125;
+		&#125;
+	&#125;
+	return handlerMappings;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>获取到handler后，会调用handler的parse方法解析自定义标签，实现如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public BeanDefinition parse(Element element, ParserContext parserContext) &#123;
+    &#x2F;&#x2F;获取解析自定义标签的parser
+    BeanDefinitionParser parser &#x3D; this.findParserForElement(element, parserContext);
+    return parser !&#x3D; null ? parser.parse(element, parserContext) : null;
+&#125;
+
+private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) &#123;
+    &#x2F;&#x2F;获取自定义标签的名称，如aop标签中的aspectj-autoproxy
+    String localName &#x3D; parserContext.getDelegate().getLocalName(element);
+    &#x2F;&#x2F;获取标签名对应的parser
+    BeanDefinitionParser parser &#x3D; (BeanDefinitionParser)this.parsers.get(localName);
+    if (parser &#x3D;&#x3D; null) &#123;
+        parserContext.getReaderContext().fatal(&quot;Cannot locate BeanDefinitionParser for element [&quot; + localName + &quot;]&quot;, element);
+    &#125;
+
+    return parser;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>对于aop标签，其parser的源码如下</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">public class AopNamespaceHandler extends NamespaceHandlerSupport &#123;
+
+	@Override
+	public void init() &#123;
+		registerBeanDefinitionParser(&quot;config&quot;, new ConfigBeanDefinitionParser());
+		registerBeanDefinitionParser(&quot;aspectj-autoproxy&quot;, new AspectJAutoProxyBeanDefinitionParser());
+		registerBeanDefinitionDecorator(&quot;scoped-proxy&quot;, new ScopedProxyBeanDefinitionDecorator());
+		registerBeanDefinitionParser(&quot;spring-configured&quot;, new SpringConfiguredBeanDefinitionParser());
+	&#125;
+
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>由于aop并不需要返回任何bean，因此AspectJAutoProxyBeanDefinitionParser只实现了BeanDefinitionParser接口，在执行parser.parse(element, parserContext)这一行的时候会调用AspectJAutoProxyBeanDefinitionParser的parse方法。但对于我们自己写的parser，一般都是继承AbstractSingleBeanDefinitionParser，然后重写doParse(Element element, BeanDefinitionBuilder builder)方法并将我们自定义的bean放入入参的BeanDefinitionBuilder中，这段逻辑是在parse方法中</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java"> public final BeanDefinition parse(Element element, ParserContext parserContext) &#123;
+   &#x2F;&#x2F;解析自定义标签并得到解析后的BeanDefinition
+	AbstractBeanDefinition definition &#x3D; parseInternal(element, parserContext);
+	if (definition !&#x3D; null &amp;&amp; !parserContext.isNested()) &#123;
+		try &#123;
+			String id &#x3D; resolveId(element, definition, parserContext);
+			if (!StringUtils.hasText(id)) &#123;
+				parserContext.getReaderContext().error(
+						&quot;Id is required for element &#39;&quot; + parserContext.getDelegate().getLocalName(element)
+								+ &quot;&#39; when used as a top-level tag&quot;, element);
+			&#125;
+			String[] aliases &#x3D; null;
+			if (shouldParseNameAsAliases()) &#123;
+				String name &#x3D; element.getAttribute(NAME_ATTRIBUTE);
+				if (StringUtils.hasLength(name)) &#123;
+					aliases &#x3D; StringUtils.trimArrayElements(StringUtils.commaDelimitedListToStringArray(name));
+				&#125;
+			&#125;
+			BeanDefinitionHolder holder &#x3D; new BeanDefinitionHolder(definition, id, aliases);
+			registerBeanDefinition(holder, parserContext.getRegistry());
+			if (shouldFireEvents()) &#123;
+				BeanComponentDefinition componentDefinition &#x3D; new BeanComponentDefinition(holder);
+				postProcessComponentDefinition(componentDefinition);
+				parserContext.registerComponent(componentDefinition);
+			&#125;
+		&#125;
+		catch (BeanDefinitionStoreException ex) &#123;
+			String msg &#x3D; ex.getMessage();
+			parserContext.getReaderContext().error((msg !&#x3D; null ? msg : ex.toString()), element);
+			return null;
+		&#125;
+	&#125;
+	return definition;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>解析标签在方法中的第一行parseInternal方法中</p>
+<pre class="line-numbers language-Java" data-language="Java"><code class="language-Java">protected final AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) &#123;
+    BeanDefinitionBuilder builder &#x3D; BeanDefinitionBuilder.genericBeanDefinition();
+    String parentName &#x3D; this.getParentName(element);
+    if (parentName !&#x3D; null) &#123;
+        builder.getRawBeanDefinition().setParentName(parentName);
+    &#125;
+
+    Class&lt;?&gt; beanClass &#x3D; this.getBeanClass(element);
+    if (beanClass !&#x3D; null) &#123;
+        builder.getRawBeanDefinition().setBeanClass(beanClass);
+    &#125; else &#123;
+        String beanClassName &#x3D; this.getBeanClassName(element);
+        if (beanClassName !&#x3D; null) &#123;
+            builder.getRawBeanDefinition().setBeanClassName(beanClassName);
+        &#125;
+    &#125;
+
+    builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
+    BeanDefinition containingBd &#x3D; parserContext.getContainingBeanDefinition();
+    if (containingBd !&#x3D; null) &#123;
+        builder.setScope(containingBd.getScope());
+    &#125;
+
+    if (parserContext.isDefaultLazyInit()) &#123;
+        builder.setLazyInit(true);
+    &#125;
+    &#x2F;&#x2F;解析标签
+    this.doParse(element, parserContext, builder);
+    return builder.getBeanDefinition();
+&#125;
+&#x2F;&#x2F;交给子类重写，例如我们自己定义的parser
+protected void doParse(Element element, BeanDefinitionBuilder builder) &#123;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                                    <span class="chip bg-color">Spring源码</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2021/08/14/Spring%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%89)/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Spring源码解析(三)">
+                        
+                        <span class="card-title">Spring源码解析(三)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Spring源码解析——自定义xml标签的解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-14
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                    Spring源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">Spring源码</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2021/07/31/Spring%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="Spring源码解析(二)">
+                        
+                        <span class="card-title">Spring源码解析(二)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Spring源码解析——默认xml标签的解析
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-07-31
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Spring%E6%BA%90%E7%A0%81/" class="post-category">
+                                    Spring源码
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Spring%E6%BA%90%E7%A0%81/">
+                        <span class="chip bg-color">Spring源码</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Xu Tao</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
